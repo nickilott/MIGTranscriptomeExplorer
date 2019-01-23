@@ -160,7 +160,6 @@ getExpression <- function(connection, dataset, gene){
     probes <- getProbes(connection, dataset, gene)
     mat <- getMatrix(connection, dataset)
     mat <- mat[probes,]
-    dbDisconnect(connection)
     return(mat)
 }
 
