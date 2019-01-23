@@ -23,8 +23,8 @@ ui <- pageWithSidebar(
 server <- function(input, output) {
 
     output$dataset.table <- renderDataTable({
-        input$show.datasets
-        showDatasets(connect())})
+        input$show.datasets <- showDatasets(connect())
+	})
 }
 
 shinyApp(ui, server)
