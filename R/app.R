@@ -4,26 +4,28 @@ library(MIGTranscriptomeExplorer)
 # Define UI for MIGTranscriptomeDB app
 ui <- pageWithSidebar(
   
-  # App title
-  headerPanel("MIGTranscriptomeDB: Database of transcriptomic data sets"),
+    # App title
+    headerPanel("MIGTranscriptomeDB: Database of transcriptomic data sets"),
   
-  # Sidebar panel for inputs
+    # Sidebar panel for inputs
 
-  sidebarPanel(
-       actionButton("show_datasets", "show datasets")
-       textInput("word", label="Gene:", value = ""),
-       actionButton("gene_search", "get expression")),
-  
-  # Main panel for displaying outputs
-  mainPanel()
+    sidebarPanel(
+        actionButton("show.datasets", "show datasets"),
+        tableOutput('dataset.table')
+        textInput("word", label="Gene:", value = ""),
+        actionButton("gene.search", "get expression")),
+      
+
+    # Main panel for displaying outputs
+    mainPanel()
 )
 
 # Define server logic
 server <- function(input, output) {
-  
-  
-  
 
+    output$dataset.table <- renderDataTable({
+        input$show.datasets
+        showDatasets(connect())})
 }
 
 shinyApp(ui, server)
