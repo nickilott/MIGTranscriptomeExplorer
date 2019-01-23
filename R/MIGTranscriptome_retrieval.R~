@@ -1,0 +1,4 @@
+# Data accessing from within R using RSQLite3
+
+library(RSQLite)
+
