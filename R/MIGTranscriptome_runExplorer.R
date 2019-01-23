@@ -9,5 +9,5 @@
 runExplorer <- function(){
 
     app <- system.file("app.R", package="MIGTranscriptomeExplorer")
-    shiny(app)
+    runApp(app)
 }
