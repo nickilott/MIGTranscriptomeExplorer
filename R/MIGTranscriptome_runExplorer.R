@@ -8,6 +8,6 @@
 
 runExplorer <- function(){
 
-    app <- system.file("R/app.R", package="MIGTranscriptomeExplorer")
+    app <- system.file("app.R", package="MIGTranscriptomeExplorer")
     shiny(app)
 }
