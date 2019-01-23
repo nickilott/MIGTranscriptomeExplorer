@@ -12,9 +12,8 @@ ui <- pageWithSidebar(
     sidebarPanel(
         actionButton("show.datasets", "show datasets"),
         tableOutput('dataset.table'),
-        textInput("word", label="Gene:", value = ""),
+        textInput("gene", label="Gene:", value = ""),
         actionButton("gene.search", "get expression")),
-      
 
     # Main panel for displaying outputs
     mainPanel()
