@@ -69,7 +69,7 @@ server <- function(input, output) {
     df <- NULL
     })
     renderDataTable({
-    clear.table <- df
+    output$dataset.table <- df
     })
 
     ######################
