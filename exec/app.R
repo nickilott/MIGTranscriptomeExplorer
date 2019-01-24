@@ -44,7 +44,7 @@ ui <- pageWithSidebar(
 
 	uiOutput("ma.contrasts"),
 	h5("Thresholds"),
-	numericInput("ma.lfc", label="lfc", value = 1),
+	numericInput("ma.lfc", label="lfc", value = 1)
 	),
 
     # Main panel for displaying outputs
