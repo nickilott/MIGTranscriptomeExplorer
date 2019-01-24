@@ -65,7 +65,7 @@ server <- function(input, output) {
 
     # clear outputs
     observeEvent(input$clear.table,{
-    removeUI(selector = "#dataset.table")
+    renderDataTable({
     })
 
     ######################
