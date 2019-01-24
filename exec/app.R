@@ -51,6 +51,7 @@ ui <- pageWithSidebar(
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
+              dataTableOutput("clear.table")
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
@@ -64,9 +65,11 @@ conn <- connect(db=db)
 server <- function(input, output) {
 
     # clear outputs
-    observeEvent(input$clear.table,{
-    renderDataTable({
+    eventReactive(input$clear.table,{
+    df <- NULL
     })
+    renderDataTable({
+    clear.table <- df
     })
 
     ######################
