@@ -158,7 +158,7 @@ server <- function(input, output) {
     })
 
     output$ma.contrasts <- renderUI({
-    contrasts <- getContrasts(conn, input$choose.dataset)
+    contrasts <- getContrasts(conn, input$choose.dataset)$contrast
     names(contrasts) <- contrasts
     selectInput("ma.contrasts", "contrast", contrasts)
     })
