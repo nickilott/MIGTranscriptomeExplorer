@@ -42,7 +42,7 @@ ui <- pageWithSidebar(
 	h5("Plot expression vs. fold change"),
 	actionButton("MA", "MA plot"),
 
-	uiOutput("ma.contrasts")
+	uiOutput("ma.contrasts"),
 	h5("Thresholds"),
 	numericInput("ma.lfc", label="lfc", value = 1),
 	),
