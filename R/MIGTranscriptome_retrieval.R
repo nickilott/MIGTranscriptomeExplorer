@@ -190,11 +190,34 @@ getMetadata <- function(connection, dataset){
 ##################################################
 ##################################################
 
+#' Get list of variables
+#'
+#' Return a list of metadata variables for a given dataset
+#' @param connection sqlite connection
+#' @param dataset string (dataset to retrieve metadata for)
+#' @examples
+#' getMetadataList(connect(), "MIGTranscriptome_0001")
+#' @export
+
+getMetadataList <- function(connection, dataset){
+
+    # return a list of variables from metadata
+    statement <- paste0('SELECT metadata FROM reference WHERE dataset==', '"', dataset, '"')
+    metadata <- dbGetQuery(connection, statement)$metadata
+    metadata <- unlist(strsplit(metadata, ","))
+    return(metadata)
+}
+
+##################################################
+##################################################
+##################################################
+
 #' Sort metadata
 #'
 #' Sort metadata by sample names given in an expression matrix
 #' @param mat expression matrix (data frame)
 #' @param metadata metadata returned by getMetadata (data frame)
+#' @export
 #' @examples
 #' mat <- getMatrix(connect(), "MIGTranscriptome_0001")
 #' metdata <- getMetadata(connect(), "MIGTranscriptome_0001")
@@ -208,7 +231,148 @@ sortMetadata <- function(mat, metadata){
     return(metadata)
 }
 
+
 ##################################################
 ##################################################
 ##################################################
+
+#' Get contrasts
+#'
+#' Get contrasts for a specified dataset
+#' @param connection database connection
+#' @param dataset dataset of interest in database
+#' @export
+#' @examples
+#' getContrasts(conn, "MIGTranscriptome_0001")
+
+getContrasts <- function(conn, dataset){
+
+    statement <- paste0('SELECT contrasts FROM reference WHERE dataset==', '"', dataset, '"')
+    contrasts <- dbGetQuery(conn, statement)
+    contrasts <- gsub("-", "_", contrasts$contrasts)
+    contrasts <- unlist(strsplit(contrasts, ","))
+    return(contrasts)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Get significant sets
+#'
+#' Get significant expression differences for dataset and contrast
+#' of interest
+#' @param connection database connection
+#' @param dataset dataset of interest in database
+#' @param contrast contrast of interest
+#' @param lfc log2 fold change threshold for defining significance
+#' @param padj adjusted p-value threshold for defining significance
+#' @param gene gene to find out if significant
+#' @export
+#' @examples
+#' getSignificant(conn, "MIGTranscriptome_0001", "SNHh_TSB", "IL10")
+
+getSignificant <- function(connection, dataset, contrast, lfc, padj, gene){
+
+    # input comes as characters
+    # so need to change here
+    lfc <- as.numeric(lfc)
+    padj <- as.numeric(padj)
+
+    probes <- getProbes(connection, dataset, gene)
+    probes <- paste0(probes, collapse=",")
+    tablename <- getTablename(getTablename(dataset, contrast), type="result")
+
+    # query
+    statement <- paste0('SELECT * FROM ', tablename, ' WHERE test_id IN ', '(', probes, ')', ' AND padj < ', padj, ' AND ABS(l2fold) > ', lfc)
+
+    significant <- dbGetQuery(connection, statement)
+    if (nrow(significant) == 0){
+        significant <- NA
+    }
+    else
+    {
+    significant$dataset <- dataset
+    significant <- significant[, c("dataset", "test_id", "l2fold", "padj")]
+    }
+    return(significant)		
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Get differential expression results
+#'
+#' Get the differential expression results for
+#' a given dataset and contrast
+#' @param conn connection
+#' @param dataset dataset to choose
+#' @param contrast contrast of interest
+#' @export
+#' @examples
+#' getResultSet(connect(), "MIGTranscriptome_0001", "SNHh_TSB")
+
+getResultSet <- function(conn, dataset, contrast){
+
+    tablename <- getTablename(conn, type="result")
+    statement <- paste0('SELECT * FROM ', tablename)
+    dat <- dbGetQuery(statement)
+    return(dat)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Run PCA
+#'
+#' Run PCA on matrix
+#' @param df data frame of normalised counts
+#' @export
+#' @examples
+#' runPCA(df)
+
+runPCA <- function(df){
+
+    pc <- prcomp(t(df))
+    return (pc)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Get PCA
+#'
+#' Get princple components
+#' @param pc prcomp object
+#' @export
+#' @examples
+#' getPCA(runPCA(df))
+
+getPCA <- function(pc){
+
+    pcs <- data.frame(pc$x)
+    return(pcs)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Get variance explained
+#'
+#' Get variance explained for prcomp object
+#' @param pc prcomp object
+#' @param component string (component to get VE for)
+#' @export
+#' @examples
+#' getVE(runPCA(df))
+
+getVE <- function(pc, component="PC1"){
+
+    pve <- summary(pc)$importance[,component][[2]]
+    return (pve)
+}
 

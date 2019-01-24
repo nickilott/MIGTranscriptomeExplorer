@@ -43,3 +43,92 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
     plot8 <- plot7 + scale_colour_manual(values=colours) + xlab("")
     return(plot8)
 }
+
+##################################################
+##################################################
+##################################################
+
+#' Plot PCA
+#'
+#' Plot PCA of dataset of interest
+#' @param pc prcomp object
+#' @param colourby vector of conditions
+#' @param pcs vector of pcs to plot
+#' @export
+#' @examples
+#' plotPCA(PCA(mat))
+
+plotPrincipleComponents <- function(pc, metadata, colourby="none", pcs=c("PC1", "PC2")){
+
+    # covariate must be in same order as pc rownames
+
+    # get variance explained for each component
+    ve1 <- getVE(pc, component=pcs[1])
+    ve2 <- getVE(pc, component=pcs[2])
+
+    ve1 <- round(ve1, 2)*100
+    ve2 <- round(ve2, 2)*100
+
+    # get data frame of components
+    pca <- data.frame(pc$x)
+
+    # add conditions
+    pca$condition <- metadata[,colourby]
+    pca$condition <- factor(pca$condition, levels=unique(pca$condition))
+
+    # plot
+    pc1 <- pcs[1]
+    pc2 <- pcs[2]
+
+    # labels
+    xlabel <- paste(pc1, ve1, sep=" (")
+    xlabel <- paste(xlabel, "%", sep="")
+    xlabel <- paste(xlabel, ")", sep="")
+    ylabel <- paste(pc2, ve2, sep=" (")
+    ylabel <- paste(ylabel, "%", sep="")	
+    ylabel <- paste(ylabel, ")", sep="")
+
+    n <- length(unique(pca$condition))
+    colours <- rainbow(n, s=0.7, v=0.6)
+    
+    plot1 <- ggplot(pca, aes_string(x=pc1, y=pc2, group="condition", colour="condition"))
+    plot2 <- plot1 + geom_point(size=3)
+    plot3 <- plot2 + theme_bw() 
+    plot4 <- plot3 + xlab(xlabel) + ylab(ylabel) + scale_colour_manual(values=colours)
+    return(plot4) 
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Plot MA
+#'
+#' Plot expression level against fold change
+#' @param dat data frame of results
+#' @param lfc log2 fold change threshold
+#' @param title title for the plot
+#' @export
+#' @examples
+#' plotMA(dat)
+
+plotMA <- function(dat, lfc=1, title="default title"){
+
+       nup <- nrow(dat[dat$significant=="Yes" & dat$l2fold > lfc & !(is.na(dat$padj)) & !(is.na(dat$l2fold)),])
+       ndown <- nrow(dat[dat$significant=="Yes" & dat$l2fold < (-lfc) & !(is.na(dat$padj)) & !(is.na(dat$l2fold)),])
+
+       nup <- paste("Upregulated = ", nup, sep="")
+       ndown <- paste("Downregulated = ", ndown, sep="")
+
+       plot1 <- ggplot(na.omit(dat), aes(x=aveexprs, y=l2fold, colour=significant))
+       plot2 <- plot1 + geom_point(pch=18, size=1)
+       plot3 <- plot2 + scale_colour_manual(values=c("grey", "darkRed"))
+       plot4 <- plot3 + theme_bw()
+       plot5 <- plot4 + theme(text=element_text(size=10))
+       plot6 <- plot5 + geom_hline(yintercept=c(-(lfc),lfc,0), linetype="dashed")
+       plot7 <- plot6 + xlab("Mean expression") + ylab("Log2 fold change")
+       plot8 <- plot7 + annotate("text", x=9, y=6, label=nup, size=3)
+       plot9 <- plot8 + annotate("text", x=9, y=-6, label=ndown, size=3)
+       plot10 <- plot9 + ggtitle(title)
+       return (plot10)
+       }
