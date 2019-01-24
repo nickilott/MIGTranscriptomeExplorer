@@ -50,7 +50,8 @@ ui <- pageWithSidebar(
 	),
 
     # Main panel for displaying outputs
-    mainPanel(dataTableOutput("dataset.table"),
+    mainPanel(div(id = "alloutputs"),
+              dataTableOutput("dataset.table"),
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
@@ -65,7 +66,7 @@ server <- function(input, output) {
 
     observeEvent(input$reset, {
     removeUI(
-    selector = "div:has(> #dataset.table)"
+    selector = "div:has(> #alloutput)"
     )
     })
 
