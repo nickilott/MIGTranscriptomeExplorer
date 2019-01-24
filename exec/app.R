@@ -1,3 +1,4 @@
+
 library(shiny)
 library(MIGTranscriptomeExplorer)
 library(gridExtra)
@@ -42,7 +43,7 @@ ui <- pageWithSidebar(
 	h5("Plot expression vs. fold change"),
 	actionButton("MA", "MA plot"),
 
-	uiOutput("ma.contrasts"),
+	uiOutput("ma.contrast"),
 	h5("Thresholds"),
 	numericInput("ma.lfc", label="lfc", value = 1)
 	),
@@ -157,10 +158,10 @@ server <- function(input, output) {
     PCA()
     })
 
-    output$ma.contrasts <- renderUI({
+    output$ma.contrast <- renderUI({
     contrasts <- getContrasts(conn, input$choose.dataset)
     names(contrasts) <- contrasts
-    selectInput("ma.contrasts", "contrast", contrasts)
+    selectInput("ma.contrast", "contrast", contrasts)
     })
 
     MA <- eventReactive(input$MA, {
