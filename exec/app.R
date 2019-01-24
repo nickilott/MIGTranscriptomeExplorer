@@ -51,7 +51,7 @@ ui <- pageWithSidebar(
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
-              dataTableOutput("clear.table")
+              dataTableOutput("clear.table"),
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
