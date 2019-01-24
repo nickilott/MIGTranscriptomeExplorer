@@ -114,11 +114,13 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", pcs=c("PC1", 
 
 plotMA <- function(dat, lfc=1, title="default title"){
 
-       nup <- nrow(dat[dat$significant=="Yes" & dat$l2fold > lfc & !(is.na(dat$padj)) & !(is.na(dat$l2fold)),])
-       ndown <- nrow(dat[dat$significant=="Yes" & dat$l2fold < (-lfc) & !(is.na(dat$padj)) & !(is.na(dat$l2fold)),])
+       nup <- nrow(dat[dat$padj < 0.05 & dat$l2fold > lfc & !(is.na(dat$padj)) & !(is.na(dat$l2fold)),])
+       ndown <- nrow(dat[dat$padj < 0.05 & dat$l2fold < (-lfc) & !(is.na(dat$padj)) & !(is.na(dat$l2fold)),])
 
        nup <- paste("Upregulated = ", nup, sep="")
        ndown <- paste("Downregulated = ", ndown, sep="")
+
+       dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$l2fold) > lfc & !(is.na(dat$padj)) & !(is.na(dat$l2fold)), "Yes", "No")
 
        plot1 <- ggplot(na.omit(dat), aes(x=aveexprs, y=l2fold, colour=significant))
        plot2 <- plot1 + geom_point(pch=18, size=1)
