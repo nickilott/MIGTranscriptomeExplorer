@@ -1,6 +1,7 @@
 library(shiny)
 library(MIGTranscriptomeExplorer)
 library(gridExtra)
+library(RSQLite)
 
 # Define UI for MIGTranscriptomeDB app
 ui <- pageWithSidebar(
