@@ -8,6 +8,6 @@
 
 runExplorer <- function(){
 
-    app <- system.file("app.R", package="MIGTranscriptomeExplorer")
+    app <- system.file("exec/app.R", package="MIGTranscriptomeExplorer")
     runApp(app)
 }
