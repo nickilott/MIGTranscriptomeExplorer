@@ -1,11 +1,11 @@
-
+# load packages
 library(shiny)
 library(MIGTranscriptomeExplorer)
 library(gridExtra)
 library(RSQLite)
 library(dplyr)
 
-# Define UI for MIGTranscriptomeDB app
+# Define UI for MIGTranscriptomeExplorer app
 
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
 conn <- connect(db=db)
@@ -13,11 +13,12 @@ conn <- connect(db=db)
 ui <- pageWithSidebar(
   
     # App title
-    headerPanel("MIGTranscriptomeExplorer: Exploring database of transcriptomic data sets"),
+    headerPanel("MIGTranscriptomeExplorer"),
   
     # Sidebar panel for inputs
 
     sidebarPanel(
+	h2("Explore gene expression across datasets"),
 	h4("Available datasets"),
         actionButton("show.datasets", "show datasets"),
 
@@ -25,27 +26,28 @@ ui <- pageWithSidebar(
 	textInput("gene", label="Gene:", value = ""),
         actionButton("gene.search", "get expression"),
 
-	h4("Significant contrasts"),
+	h4("Significant contrasts in database"),
 	h5("Specify thresholds"),
 	numericInput("lfc", label="lfc:", value = 0),
 	numericInput("padj", label="padj", value = 0.05),
 	actionButton("significant", "get significant"),
 
+	h2("Explore specific dataset"),
 	h4("Choose dataset"),
 	selectInput("choose.dataset", "Dataset:", choices=list(showDatasets(conn)$dataset)),
 
 	h4("Principle Components Analysis"),
+	h5("Colour by"),
+	uiOutput("variable"),
 	actionButton("PCA", "PCA"),
 
-	h4("Colour by"),
-	uiOutput("variable"),
-
-	h5("Plot expression vs. fold change"),
-	actionButton("MA", "MA plot"),
-
+	h4("Plot expression vs. fold change"),
 	uiOutput("ma.contrast"),
 	h5("Thresholds"),
 	numericInput("ma.lfc", label="lfc", value = 1)
+	actionButton("MA", "MA plot"),
+
+	actionButton("reset", "Clear")
 	),
 
     # Main panel for displaying outputs
@@ -62,6 +64,14 @@ conn <- connect(db=db)
 # Define server logic
 server <- function(input, output) {
 
+    # clear outputs
+    observeEvent(input$reset,{
+    removeUI(selector = "#dataset.table")
+    removeUI(selector = "#gene.expression")
+    removeUI(selector = "#significant.results")
+    removeUI(selector = "#PCA")
+    removeUI(selector = "#MA")
+    })
 
     ######################
     # displaying datasets
