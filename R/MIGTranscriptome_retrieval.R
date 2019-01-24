@@ -316,6 +316,7 @@ getSignificant <- function(connection, dataset, contrast, lfc, padj, gene){
 getResultSet <- function(conn, dataset, contrast){
 
     tablename <- getTablename(dataset, type="result")
+    tablename <- paste0(dataset, "_", contrast, "_result")
     statement <- paste0('SELECT * FROM ', '"', tablename, '"')
     dat <- dbGetQuery(conn, statement)
     return(dat)
