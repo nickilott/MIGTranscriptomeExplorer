@@ -21,6 +21,7 @@ ui <- pageWithSidebar(
 	h2("Explore gene expression across datasets"),
 	h4("Available datasets"),
         actionButton("show.datasets", "show datasets"),
+	actionButton("clear.table", "Clear table"),	
 
 	h4("Search for gene in database"),
 	textInput("gene", label="Gene:", value = ""),
@@ -46,8 +47,6 @@ ui <- pageWithSidebar(
 	h5("Thresholds"),
 	numericInput("ma.lfc", label="lfc", value = 1),
 	actionButton("MA", "MA plot"),
-
-	actionButton("reset", "Clear")
 	),
 
     # Main panel for displaying outputs
@@ -65,12 +64,8 @@ conn <- connect(db=db)
 server <- function(input, output) {
 
     # clear outputs
-    observeEvent(input$reset,{
+    observeEvent(input$clear.table,{
     removeUI(selector = "#dataset.table")
-    removeUI(selector = "#gene.expression")
-    removeUI(selector = "#significant.results")
-    removeUI(selector = "#PCA")
-    removeUI(selector = "#MA")
     })
 
     ######################
