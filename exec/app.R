@@ -46,7 +46,7 @@ ui <- pageWithSidebar(
 	uiOutput("ma.contrast"),
 	h5("Thresholds"),
 	numericInput("ma.lfc", label="lfc", value = 1),
-	actionButton("MA", "MA plot"),
+	actionButton("MA", "MA plot")
 	),
 
     # Main panel for displaying outputs
