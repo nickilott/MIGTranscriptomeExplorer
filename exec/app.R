@@ -67,6 +67,7 @@ server <- function(input, output) {
     observeEvent(input$clear.table,{
     renderDataTable({
     })
+    })
 
     ######################
     # displaying datasets
