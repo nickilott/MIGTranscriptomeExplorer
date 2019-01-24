@@ -21,7 +21,7 @@ ui <- pageWithSidebar(
 	h2("Explore gene expression across datasets"),
 	h4("Available datasets"),
         actionButton("show.datasets", "show datasets"),
-	actionButton("clear.table", "Clear table"),	
+	actionButton("reset", "Clear"),
 
 	h4("Search for gene in database"),
 	textInput("gene", label="Gene:", value = ""),
@@ -51,7 +51,6 @@ ui <- pageWithSidebar(
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
-              dataTableOutput("clear.table"),
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
@@ -64,12 +63,10 @@ conn <- connect(db=db)
 # Define server logic
 server <- function(input, output) {
 
-    # clear outputs
-    eventReactive(input$clear.table,{
-    df <- NULL
-    })
-    renderDataTable({
-    output$dataset.table <- df
+    observeEvent(input$reset, {
+    removeUI(
+    selector = "div:has(> #dataset.table)"
+    )
     })
 
     ######################
