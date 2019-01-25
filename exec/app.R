@@ -11,7 +11,7 @@ library(shinythemes)
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
 conn <- connect(db=db)
 
-ui <- fluidPage(theme=shinytheme("sandstone"),
+ui <- fluidPage(theme=shinytheme("minty"),
   
     # App title
     titlePanel("MIGTranscriptomeExplorer"),
