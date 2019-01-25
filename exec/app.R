@@ -10,7 +10,7 @@ library(dplyr)
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
 conn <- connect(db=db)
 
-ui <- pageWithSidebar(
+ui <- pageWithSidebar(theme=shinytheme("superhero"),
   
     # App title
     headerPanel("MIGTranscriptomeExplorer"),
