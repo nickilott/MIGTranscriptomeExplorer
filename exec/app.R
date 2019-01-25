@@ -47,7 +47,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 	    h5("Thresholds"),
 	    numericInput("ma.lfc", label="lfc", value = 1),
 	    actionButton("MA", "MA plot")
-	)),
+	),
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
@@ -56,6 +56,7 @@ ui <- fluidPage(theme=shinytheme("superhero"),
 	      plotOutput("PCA"),
 	      plotOutput("MA")
 	      )
+    )
 )
 
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
