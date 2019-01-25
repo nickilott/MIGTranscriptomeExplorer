@@ -66,7 +66,7 @@ server <- function(input, output) {
 
     observeEvent(input$reset, {
     removeUI(
-    selector = "div:has(> #alloutput)"
+    selector = "div#alloutputs)"
     )
     })
 
