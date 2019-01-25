@@ -12,4 +12,9 @@ Imports: RSQLite,
     ggplot2,
     gridExtra,
     shiny,
-    dplyr
+    shinythemes,
+    reshape,
+    dplyr,
+    gplots,
+    gtools,
+    shinyjs

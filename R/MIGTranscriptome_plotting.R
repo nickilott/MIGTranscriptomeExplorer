@@ -134,3 +134,73 @@ plotMA <- function(dat, lfc=1, title="default title"){
        plot10 <- plot9 + ggtitle(title)
        return (plot10)
        }
+
+
+##################################################
+##################################################
+##################################################
+
+#' Heatmap
+#'
+#' Heatmap of differential expression results
+#' @param mat expression matrix
+#' @param distfun distance function (dist)
+#' @param clustfun cluster function (hclust)
+#' @import gplots
+#' @import gtools
+#' @export
+#' @examples
+#' heatmap(mat)
+
+heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
+
+    distf <- function(x) dist(x, method=distfun)
+    clustf <- function(x) hclust(x, method=clustfun)
+
+    colours <- colorRampPalette(c("blue", "white", "red"))(75)
+    mat.s <- data.frame(t(apply(mat, 1, scale)))
+    rownames(mat.s) <- rownames(mat)
+    colnames(mat.s) <- colnames(mat)
+    mat.s <- na.omit(mat.s)
+    mat.s <- mat.s[,mixedsort(colnames(mat.s))]
+    heatmap.2(as.matrix(mat.s),
+              labRow=NA,
+              scale="none",
+              col=colours,
+	      Rowv=T,
+	      Colv=T,
+	      trace="none",
+	      margins=c(15,15),
+	      hclustfun=clustf,
+	      distfun=distf)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Scatterplot of fold changes
+#'
+#' Scatterplot fold changes between datasets/contrasts
+#' @param df data frame 
+#' @export
+#' @examples
+#' scatterComparisons(df)
+
+scatterComparisons <- function(df){
+
+    x <- df[,2]
+    y <- df[,3]
+
+    namex <- colnames(df)[2]
+    namey <- colnames(df)[3]
+
+    df$d <- densCols(x, y, colramp = colorRampPalette(rev(rainbow(10, v = 0.5, s = 0.5, end = 4/6))))
+    p <- ggplot(df) +
+    geom_point(aes_string(namex, namey, col = "d"), size = 1) +
+    scale_color_identity() + theme_bw()
+    p <- p + geom_hline(yintercept=c(-1, 1), colour="darkGrey", linetype="dashed")
+    p <- p + geom_vline(xintercept=c(-1, 1), colour="darkGrey", linetype="dashed")
+    
+    return(p)
+}

@@ -377,3 +377,135 @@ getVE <- function(pc, component="PC1"){
     return (pve)
 }
 
+
+
+##################################################
+##################################################
+##################################################
+
+#' Tabulate results
+
+#' Tabulate probes/genes sorted by padj
+#' @param connection connection to database
+#' @param dataset dataset to look at
+#' @param contrast contrast of interest
+#' @export
+#' @examples
+#' tabulateResults(connect(), "MIGTranscriptome_0001", "SNHh_TSB")
+
+tabulateResults <- function(connection, dataset, contrast){
+
+    result.tablename <- getTablename(dataset, type="result")
+    result.tablename <- paste0(dataset, "_", contrast, "_result")
+    probe2gene <- getTablename(dataset, type="probe2gene_map")
+    statement <- paste0('SELECT a.*, b.gene_name FROM ', result.tablename, ' as a, ', probe2gene, ' as b ', ' WHERE a.test_id==b.probe ')
+    result <- dbGetQuery(connection, statement)
+    res <- result[order(result$padj, decreasing=FALSE),]
+    return(res)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Get expression values for differentially expressed probes/genes
+
+#' Get expression matrix for differentially expressed probes/genes
+#' @param connection connection to database
+#' @param dataset dataset to see
+#' @param contrast contrast of interest
+#' @param lfc log fold change threshold
+#' @param padj adjusted p-value threshold
+#' @export
+#' @examples
+#' getDiffMatrix(connect(), "MIGTranscriptome_0001", "SNHh_TSB", 1, 0.05)
+
+getDiffMatrix <- function(connection, dataset, contrast, lfc, padj){
+
+    result.tablename <- getTablename(dataset, type="result")
+    result.tablename <- paste0(dataset, "_", contrast, "_result")
+
+    matrix.tablename <- getTablename(dataset, type="matrix")
+
+    statement <- paste0('SELECT a.* FROM ', matrix.tablename, ' as a, ', result.tablename,  ' as b  WHERE a.test_id==b.test_id AND b.padj < ', padj, ' AND abs(b.l2fold) > ', lfc)
+    mat <- dbGetQuery(connection, statement)
+    rownames(mat) <- mat$test_id
+    mat <- mat[,2:ncol(mat)]
+    return(mat)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Get choices for comparing datasets
+
+#' These form the choices for comparisons
+#' @param connection connection to database
+#' @export
+#' @examples
+#' getDatasetToContrastNames(connect())
+
+getDatasetToContrastNames <- function(connection){
+
+    statement <- 'SELECT dataset, contrasts FROM reference'
+    datasets <- dbGetQuery(connection, statement)
+    comparison.choices <- c()
+    for (dataset in datasets$dataset){
+        contrasts <- getContrasts(connection, dataset)
+	for (contrast in contrasts){
+	    newname <- paste0(dataset, "__", contrast)
+	    comparison.choices <- append(newname, comparison.choices)
+        }
+    }
+    return(comparison.choices)
+}
+
+##################################################
+##################################################
+##################################################
+
+#' Build dataframe for comparing fold changes
+
+#' Build data frame for comparing fold changes
+#' @param connection connection to database
+#' @param dataset1 string (dataset1)
+#' @param dataset2 string (dataset2)
+#' @export
+#' @examples
+#' To follow
+
+buildComparisonSet <- function(connection, dataset1, dataset2){
+
+
+    d1 <- unlist(strsplit(dataset1, "__"))
+    d2 <- unlist(strsplit(dataset2, "__"))
+
+    data1 <- d1[1]
+    contrast1 <- d1[2]
+    data2 <- d2[1]
+    contrast2 <- d2[2]
+
+    tablename1 <- getTablename(data1, type=contrast1)
+    tablename1 <- getTablename(tablename1, type="result")
+    probe2gene1 <- getTablename(data1, type="probe2gene_map")
+
+    tablename2 <- getTablename(data2, type=contrast2)
+    tablename2 <- getTablename(tablename2, type="result")
+    probe2gene2 <- getTablename(data2, type="probe2gene_map")
+
+    statement1 <- paste0('SELECT a.gene_name, AVG(b.l2fold) as l2fold FROM ', probe2gene1,  ' as a, ',  tablename1, ' as b ', 'WHERE a.probe==b.test_id GROUP BY a.gene_name')
+    l2fold1 <- dbGetQuery(connection, statement1)
+
+    statement2 <- paste0('SELECT a.gene_name, AVG(b.l2fold) as l2fold FROM ', probe2gene2,  ' as a, ',  tablename2, ' as b ', 'WHERE a.probe==b.test_id GROUP BY a.gene_name')
+    l2fold2 <- dbGetQuery(connection, statement2)
+
+    df <- merge(l2fold1, l2fold2, by.x="gene_name", by.y="gene_name")
+    colnames(df) <- c("gene_name", dataset1, dataset2)
+    return(df)
+
+}    
+
+##################################################
+##################################################
+##################################################

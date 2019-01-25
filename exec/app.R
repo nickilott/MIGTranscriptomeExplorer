@@ -5,6 +5,7 @@ library(gridExtra)
 library(RSQLite)
 library(dplyr)
 library(shinythemes)
+library(shinyjs)
 
 # Define UI for MIGTranscriptomeExplorer app
 
@@ -19,6 +20,9 @@ ui <- fluidPage(theme=shinytheme("flatly"),
     # Sidebar panel for inputs
     sidebarLayout(
         sidebarPanel(
+            shinyjs::useShinyjs(),
+            id = "side-panel",
+
 	    h2("Explore gene expression across datasets"),
 	    h4("Available datasets"),
             actionButton("show.datasets", "show datasets"),
@@ -39,25 +43,45 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h4("Principle Components Analysis"),
 	    h5("Colour by"),
+	    selectInput("PCs", "PC:", choices=c("PC1 vs. PC2" = "PC1_PC2",
+	                                        "PC1 vs. PC3" = "PC1_PC3",
+						"PC2 vs. PC3" = "PC2_PC3")),
 	    uiOutput("variable"),
 	    actionButton("PCA", "PCA"),
 
-	    h4("Plot expression vs. fold change"),
+	    h4("Differential expression results"),
 	    uiOutput("ma.contrast"),
 	    h5("Thresholds"),
 	    numericInput("ma.lfc", label="lfc", value = 1),
-	    actionButton("MA", "MA plot")
-	),
+	    actionButton("MA", "MA plot"),
+	    actionButton("heatmap", "Heatmap"),
+
+            h5("Dispay results table"),
+	    actionButton("show.results", "Tabulate"),
+
+	    h2("Compare results across datasets/contrasts"),
+	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
+	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
+	    actionButton("scatter.lfc", "Scatterplot lfc"),
+
+            tags$hr(),
+            actionButton("reset_input", "Reset inputs")
+        ),
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
-	      plotOutput("MA")
-	      )
+	      plotOutput("MA"),
+	      plotOutput("heatmap", height=800),
+              dataTableOutput("tabulate.results"),
+	      plotOutput("scatter.lfc")
+              )
     )
 )
+
+
 
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
 conn <- connect(db=db)
@@ -143,13 +167,15 @@ server <- function(input, output) {
         names(variables) <- variables
         selectInput("variable", "variable", variables)
     })
+    
     PCA <- eventReactive(input$PCA, {
         mat <- getMatrix(conn, input$choose.dataset)
         metadata <- getMetadata(conn, input$choose.dataset)
         metadata <- sortMetadata(mat, metadata)
         metadata$none <- "none"
+	pcs <- unlist(strsplit(input$PCs, "_"))
         pc <- runPCA(mat)
-        plotPrincipleComponents(pc, metadata, colourby=input$variable)
+        plotPrincipleComponents(pc, metadata, colourby=input$variable, pcs=pcs)
     })
     output$PCA <- renderPlot({
         PCA()
@@ -166,6 +192,33 @@ server <- function(input, output) {
     })
     output$MA <- renderPlot({
         MA()
+    })
+
+    heatmap <- eventReactive(input$heatmap, {
+        mat <- getDiffMatrix(conn, input$choose.dataset, input$ma.contrast, input$ma.lfc, 0.05)
+    	heatmapMatrix(mat)
+    })
+    output$heatmap <- renderPlot({
+        heatmap()
+    })
+
+    tabulate <- eventReactive(input$show.results, {
+        tabulateResults(conn, input$choose.dataset, input$ma.contrast)
+    })
+    output$tabulate.results <- renderDataTable({
+        tabulate()
+    })
+
+    scatterlfc <- eventReactive(input$scatter.lfc, {
+        df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
+	scatterComparisons(df)
+    })
+    output$scatter.lfc <- renderPlot({
+        scatterlfc()
+    })
+
+    observeEvent(input$reset_input, {
+        shinyjs::reset("side-panel")
     })
 }
 
