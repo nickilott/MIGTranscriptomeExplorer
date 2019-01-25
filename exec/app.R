@@ -4,6 +4,7 @@ library(MIGTranscriptomeExplorer)
 library(gridExtra)
 library(RSQLite)
 library(dplyr)
+library(shinyjs)
 
 # Define UI for MIGTranscriptomeExplorer app
 
@@ -65,9 +66,7 @@ conn <- connect(db=db)
 server <- function(input, output) {
 
     observeEvent(input$reset, {
-    removeUI(
-    selector = "div#alloutputs)"
-    )
+    hide("dataset.table")
     })
 
     ######################
