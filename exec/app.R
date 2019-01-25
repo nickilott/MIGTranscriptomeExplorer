@@ -50,12 +50,12 @@ ui <- pageWithSidebar(
 	),
 
     # Main panel for displaying outputs
-    mainPanel(div(id = "alloutputs"),
+    mainPanel(div(id = "alloutputs",
               dataTableOutput("dataset.table"),
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
-	      plotOutput("MA"))
+	      plotOutput("MA")))
 )
 
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
