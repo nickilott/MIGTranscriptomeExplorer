@@ -4,6 +4,7 @@ library(MIGTranscriptomeExplorer)
 library(gridExtra)
 library(RSQLite)
 library(dplyr)
+library(shinythemes)
 
 # Define UI for MIGTranscriptomeExplorer app
 
