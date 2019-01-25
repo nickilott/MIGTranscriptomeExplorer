@@ -10,43 +10,43 @@ library(dplyr)
 db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
 conn <- connect(db=db)
 
-ui <- pageWithSidebar(theme=shinytheme("superhero"),
+ui <- fluidPage(theme=shinytheme("superhero"),
   
     # App title
-    headerPanel("MIGTranscriptomeExplorer"),
+    titlePanel("MIGTranscriptomeExplorer"),
   
     # Sidebar panel for inputs
+    sidebarLayout(
+        sidebarPanel(
+	    h2("Explore gene expression across datasets"),
+	    h4("Available datasets"),
+            actionButton("show.datasets", "show datasets"),
 
-    sidebarPanel(
-	h2("Explore gene expression across datasets"),
-	h4("Available datasets"),
-        actionButton("show.datasets", "show datasets"),
+	    h4("Search for gene in database"),
+	    textInput("gene", label="Gene:", value = ""),
+            actionButton("gene.search", "get expression"),
 
-	h4("Search for gene in database"),
-	textInput("gene", label="Gene:", value = ""),
-        actionButton("gene.search", "get expression"),
+	    h4("Significant contrasts in database"),
+	    h5("Specify thresholds"),
+	    numericInput("lfc", label="lfc:", value = 0),
+	    numericInput("padj", label="padj", value = 0.05),
+	    actionButton("significant", "get significant"),
 
-	h4("Significant contrasts in database"),
-	h5("Specify thresholds"),
-	numericInput("lfc", label="lfc:", value = 0),
-	numericInput("padj", label="padj", value = 0.05),
-	actionButton("significant", "get significant"),
+	    h2("Explore specific dataset"),
+	    h4("Choose dataset"),
+	    selectInput("choose.dataset", "Dataset:", choices=list(showDatasets(conn)$dataset)),
 
-	h2("Explore specific dataset"),
-	h4("Choose dataset"),
-	selectInput("choose.dataset", "Dataset:", choices=list(showDatasets(conn)$dataset)),
+	    h4("Principle Components Analysis"),
+	    h5("Colour by"),
+	    uiOutput("variable"),
+	    actionButton("PCA", "PCA"),
 
-	h4("Principle Components Analysis"),
-	h5("Colour by"),
-	uiOutput("variable"),
-	actionButton("PCA", "PCA"),
-
-	h4("Plot expression vs. fold change"),
-	uiOutput("ma.contrast"),
-	h5("Thresholds"),
-	numericInput("ma.lfc", label="lfc", value = 1),
-	actionButton("MA", "MA plot")
-	),
+	    h4("Plot expression vs. fold change"),
+	    uiOutput("ma.contrast"),
+	    h5("Thresholds"),
+	    numericInput("ma.lfc", label="lfc", value = 1),
+	    actionButton("MA", "MA plot")
+	)),
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
