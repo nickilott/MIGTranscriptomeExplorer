@@ -105,7 +105,7 @@ server <- function(input, output) {
     #})
 
     output$dataset.table <- renderDataTable({
-        showDatasets(conn)
+        datatable(showDatasets(conn))
     })
 
     #####################
