@@ -25,7 +25,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h2("Explore gene expression across datasets"),
 	    h4("Available datasets"),
-	    checkboxInput("show.datasets", "show datasets")
+	    checkboxInput("show.datasets", "show datasets"),
 #            actionButton("show.datasets", "show datasets"),
 #	    actionButton("hide.datasets", "hide datasets"),
 
