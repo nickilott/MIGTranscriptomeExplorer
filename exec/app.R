@@ -97,7 +97,7 @@ server <- function(input, output) {
     # displaying datasets
     ######################
     observeEvent(input$show.datasest, {
-        if (input$show.dataset) shinyjs::show("dataset.table") else shinyjs::hide("dataset.table")
+        if (input$show.dataset) shinyjs::hide("dataset.table") else shinyjs::show("dataset.table")
     })
     #data <- eventReactive(input$show.datasets,{
     #    df <- showDatasets(conn)
@@ -105,7 +105,7 @@ server <- function(input, output) {
     #})
 
     output$dataset.table <- renderDataTable({
-        datatable(showDatasets(conn))
+        showDatasets(conn)
     })
 
     #####################
