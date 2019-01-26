@@ -24,8 +24,6 @@ ui <- fluidPage(theme=shinytheme("flatly"),
             id = "side-panel",
 
 	    h2("Explore gene expression across datasets"),
-	    h4("Available datasets"),
-#            actionButton("show.datasets", "show datasets"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
@@ -93,13 +91,6 @@ server <- function(input, output) {
     ######################
     # displaying datasets
     ######################
-    # observeEvent(input$show.datasest, {
-    #     if (input$show.dataset) shinyjs::hide("dataset.table") else shinyjs::show("dataset.table")
-    # })
-    # #data <- eventReactive(input$show.datasets,{
-    # #    df <- showDatasets(conn)
-    # #    df
-    # #})
 
     output$dataset.table <- renderDataTable({
         showDatasets(conn)
