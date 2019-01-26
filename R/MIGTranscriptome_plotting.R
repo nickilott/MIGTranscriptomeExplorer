@@ -33,7 +33,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
     colours <- rainbow(length(unique(metadata[,variable])), s=0.7, v=0.6)
 
     # plotting
-    plot1 <- ggplot(mat.m, aes(x=covariate, y=value, colour=covariate))
+    plot1 <- ggplot(mat.m, aes(x=factor(covariate, levels=mixedsort(unique(mat.m$covariate))), y=value, colour=covariate))
     plot2 <- plot1 + geom_boxplot(outlier.alpha=0)
     plot3 <- plot2 + geom_jitter(height=0, width=0.15)
     plot4 <- plot3 + theme_bw()

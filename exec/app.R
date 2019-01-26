@@ -39,13 +39,14 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h2("Explore specific dataset"),
 	    h4("Choose dataset"),
-	    selectInput("choose.dataset", "Dataset:", choices=list(showDatasets(conn)$dataset)),
+	    selectInput("choose.dataset", "Dataset:", choices=showDatasets(conn)$dataset),
 
 	    h4("Principle Components Analysis"),
-	    h5("Colour by"),
+
 	    selectInput("PCs", "PC:", choices=c("PC1 vs. PC2" = "PC1_PC2",
 	                                        "PC1 vs. PC3" = "PC1_PC3",
 						"PC2 vs. PC3" = "PC2_PC3")),
+	    h5("Colour by"),
 	    uiOutput("variable"),
 	    actionButton("PCA", "PCA"),
 
@@ -70,7 +71,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
     # Main panel for displaying outputs
     mainPanel(dataTableOutput("dataset.table"),
-              plotOutput("gene.expression"),
+              plotOutput("gene.expression", height=800),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
 	      plotOutput("MA"),
@@ -118,7 +119,7 @@ server <- function(input, output) {
             p <- plotGeneOfInterest(dataset, expression, metadata, variable="treatment")
             grobs.list[[i]] <- p
         }
-        grid.arrange(grobs=grobs.list, ncol=length(datasets))
+        grid.arrange(grobs=grobs.list, nrow=length(datasets), ncol=1)
     })
 
     output$gene.expression <- renderPlot({
