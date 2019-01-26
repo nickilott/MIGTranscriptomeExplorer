@@ -25,9 +25,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h2("Explore gene expression across datasets"),
 	    h4("Available datasets"),
-	    checkboxInput("show.datasets", "show datasets"),
-#            actionButton("show.datasets", "show datasets"),
-#	    actionButton("hide.datasets", "hide datasets"),
+            actionButton("show.datasets", "show datasets"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
@@ -72,8 +70,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
         ),
 
     # Main panel for displaying outputs
-    mainPanel(shinyjs::useShinyjs(),
-              dataTableOutput("dataset.table"),
+    mainPanel(dataTableOutput("dataset.table"),
               plotOutput("gene.expression", height=800),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
@@ -96,13 +93,13 @@ server <- function(input, output) {
     ######################
     # displaying datasets
     ######################
-    observeEvent(input$show.datasest, {
-        if (input$show.dataset) shinyjs::hide("dataset.table") else shinyjs::show("dataset.table")
-    })
-    #data <- eventReactive(input$show.datasets,{
-    #    df <- showDatasets(conn)
-    #    df
-    #})
+    # observeEvent(input$show.datasest, {
+    #     if (input$show.dataset) shinyjs::hide("dataset.table") else shinyjs::show("dataset.table")
+    # })
+    # #data <- eventReactive(input$show.datasets,{
+    # #    df <- showDatasets(conn)
+    # #    df
+    # #})
 
     output$dataset.table <- renderDataTable({
         showDatasets(conn)
