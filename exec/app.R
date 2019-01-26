@@ -72,7 +72,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
     # Main panel for displaying outputs
     mainPanel(
-              dataTableOutput("dataset.table")
+              dataTableOutput("dataset.table"),
               plotOutput("gene.expression", height=800),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
