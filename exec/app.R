@@ -26,6 +26,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h2("Explore gene expression across datasets"),
 	    h4("Available datasets"),
             actionButton("show.datasets", "show datasets"),
+	    actionButton("hide.datasets", "hide datasets")
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
@@ -70,7 +71,8 @@ ui <- fluidPage(theme=shinytheme("flatly"),
         ),
 
     # Main panel for displaying outputs
-    mainPanel(dataTableOutput("dataset.table"),
+    mainPanel(div(id=dataset.table.output,
+              dataTableOutput("dataset.table")),
               plotOutput("gene.expression", height=800),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
@@ -220,6 +222,10 @@ server <- function(input, output) {
 
     observeEvent(input$reset_input, {
         shinyjs::reset("side-panel")
+    })
+
+    observeEvent(input$hide.datasest, {
+        shinyjs::hide("dataset.table.output")
     })
 }
 
