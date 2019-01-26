@@ -25,7 +25,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h2("Explore gene expression across datasets"),
 	    h4("Available datasets"),
-            actionButton("show.datasets", "show datasets"),
+#            actionButton("show.datasets", "show datasets"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
