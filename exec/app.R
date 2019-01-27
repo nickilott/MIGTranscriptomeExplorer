@@ -68,12 +68,12 @@ ui <- fluidPage(theme=shinytheme("flatly"),
         ),
 
     # Main panel for displaying outputs
-    mainPanel(dataTableOutput("dataset.table", height=100),
-              plotOutput("gene.expression", height=800),
+    mainPanel(dataTableOutput("dataset.table"),
+              plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
 	      plotOutput("MA"),
-	      plotOutput("heatmap", height=800),
+	      plotOutput("heatmap"),
               dataTableOutput("tabulate.results"),
 	      plotOutput("scatter.lfc")
               )
@@ -108,12 +108,14 @@ server <- function(input, output) {
         for (i in 1:length(datasets)){
             dataset <- datasets[i]
             expression <- getExpression(conn, dataset, input$gene) 
+            expression <- na.omit(expression)
 	    if (nrow(expression) == 0){next}
 	    metadata <- getMetadata(conn, dataset)
             p <- plotGeneOfInterest(dataset, expression, metadata, variable="treatment")
             grobs.list[[i]] <- p
         }
-        grid.arrange(grobs=grobs.list, nrow=length(datasets), ncol=1)
+	# hardcoded
+        grid.arrange(grobs=grobs.list, nrow=2, ncol=2)
     })
 
     output$gene.expression <- renderPlot({
