@@ -30,7 +30,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
         plot8 <- plot7 + theme(axis.text.y=element_blank())
         plot9 <- plot8 + theme(axis.ticks=element_blank())
         plot10 <- plot9 + theme(axis.title.x=element_blank())
-        plot10 <- plot10 + theme(axis.title.y=element_blank())
+        plot10 <- plot10 + theme(axis.title.y=element_blank()) + ggtitle(dataset)
         return(plot10)
     }else{
 
