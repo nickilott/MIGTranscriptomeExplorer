@@ -280,7 +280,7 @@ getSignificant <- function(connection, dataset, contrast, lfc, padj, gene){
     padj <- as.numeric(padj)
 
     probes <- getProbes(connection, dataset, gene)
-    if (len(probes) == 1){
+    if (length(probes) == 1){
         probes <- convertGene(probes)
     }
     
