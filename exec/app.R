@@ -109,7 +109,6 @@ server <- function(input, output) {
             dataset <- datasets[i]
             expression <- getExpression(conn, dataset, input$gene) 
             expression <- na.omit(expression)
-	    if (nrow(expression) == 0){next}
 	    metadata <- getMetadata(conn, dataset)
             p <- plotGeneOfInterest(dataset, expression, metadata, variable="treatment")
             grobs.list[[i]] <- p
