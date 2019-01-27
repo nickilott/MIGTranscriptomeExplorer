@@ -19,9 +19,9 @@ library(reshape)
 plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
 
     # plot for if there's no data
-    if (nrow(mat) == 0)){
+    if (nrow(mat) == 0){
         plot1 <- ggplot(data.frame(x=1, y=1, text="No data"), aes(x=x, y=y, text=text)) + geom_text()
-	plot2 <- plot1 + theme(panel.background=element_rect(fill="white", colour="white")
+	plot2 <- plot1 + theme(panel.background=element_rect(fill="white", colour="white"))
 	plot3 <- plot2 + theme(panel.grid.major=element_line(colour="white"))
         plot4 <- plot3 + theme(panel.grid.minor=element_line(colour="white"))
         plot5 <- plot4 + theme(legend.position="none")
