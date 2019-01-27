@@ -18,30 +18,47 @@ library(reshape)
 
 plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
 
-    # sort the metadata
-    sortMetadata(mat, metadata)    
+    # plot for if there's no data
+    if (nrow(mat) == 0)){
+        plot1 <- ggplot(data.frame(x=1, y=1, text="No data"), aes(x=x, y=y, text=text)) + geom_text()
+	plot2 <- plot1 + theme(panel.background=element_rect(fill="white", colour="white")
+	plot3 <- plot2 + theme(panel.grid.major=element_line(colour="white"))
+        plot4 <- plot3 + theme(panel.grid.minor=element_line(colour="white"))
+        plot5 <- plot4 + theme(legend.position="none")
+        plot6 <- plot5 + theme(axis.line=element_blank())
+        plot7 <- plot6 + theme(axis.text.x=element_blank())
+        plot8 <- plot7 + theme(axis.text.y=element_blank())
+        plot9 <- plot8 + theme(axis.ticks=element_blank())
+        plot10 <- plot9 + theme(axis.title.x=element_blank())
+        plot10 <- plot10 + theme(axis.title.y=element_blank())
+        return(plot10)
+    }else{
 
-    # add the test_id as variable
-    mat$test_id <- rownames(mat)
+        # sort the metadata
+        sortMetadata(mat, metadata)    
 
-    # reshape
-    mat.m <- melt(mat)
+        # add the test_id as variable
+        mat$test_id <- rownames(mat)
 
-    # add metadata
-    mat.m$covariate <- rep(metadata[,variable], nrow(mat))
+        # reshape
+        mat.m <- melt(mat)
 
-    colours <- rainbow(length(unique(metadata[,variable])), s=0.7, v=0.6)
+        # add metadata
+        mat.m$covariate <- rep(metadata[,variable], nrow(mat))
 
-    # plotting
-    plot1 <- ggplot(mat.m, aes(x=factor(covariate, levels=mixedsort(unique(mat.m$covariate))), y=value, colour=covariate))
-    plot2 <- plot1 + geom_boxplot(outlier.alpha=0)
-    plot3 <- plot2 + geom_jitter(height=0, width=0.15)
-    plot4 <- plot3 + theme_bw()
-    plot5 <- plot4 + ggtitle(dataset)
-    plot6 <- plot5 + facet_wrap(~test_id, nrow=1)
-    plot7 <- plot6 + ylab("Expression level")
-    plot8 <- plot7 + scale_colour_manual(values=colours) + xlab("")
-    return(plot8)
+        colours <- rainbow(length(unique(metadata[,variable])), s=0.7, v=0.6)
+
+        # plotting
+        plot1 <- ggplot(mat.m, aes(x=factor(covariate, levels=mixedsort(unique(mat.m$covariate))), y=value, colour=covariate))
+        plot2 <- plot1 + geom_boxplot(outlier.alpha=0)
+        plot3 <- plot2 + geom_jitter(height=0, width=0.15)
+        plot4 <- plot3 + theme_bw()
+        plot5 <- plot4 + ggtitle(dataset)
+        plot6 <- plot5 + facet_wrap(~test_id, nrow=1)
+        plot7 <- plot6 + ylab("Expression level")
+        plot8 <- plot7 + scale_colour_manual(values=colours) + xlab("")
+        return(plot8)
+    }
 }
 
 ##################################################
