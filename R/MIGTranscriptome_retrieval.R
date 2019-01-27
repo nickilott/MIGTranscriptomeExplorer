@@ -280,6 +280,10 @@ getSignificant <- function(connection, dataset, contrast, lfc, padj, gene){
     padj <- as.numeric(padj)
 
     probes <- getProbes(connection, dataset, gene)
+    if (len(probes) == 1){
+        probes <- convertGene(probes)
+    }
+    
     probes <- paste0(probes, collapse=",")
     tablename <- getTablename(getTablename(dataset, contrast), type="result")
 
