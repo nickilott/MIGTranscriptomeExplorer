@@ -21,7 +21,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
     # plot for if there's no data
     if (nrow(mat) == 0){
         df <- data.frame(x=1, y=1, text.output="No data")
-        plot1 <- ggplot(df, aes(x=x, y=y)) + geom_text(label=text.output)
+        plot1 <- ggplot(df, aes(x=x, y=y, label=text.output)) + geom_text()
 	plot2 <- plot1 + theme(panel.background=element_rect(fill="white", colour="white"))
 	plot3 <- plot2 + theme(panel.grid.major=element_line(colour="white"))
         plot4 <- plot3 + theme(panel.grid.minor=element_line(colour="white"))
