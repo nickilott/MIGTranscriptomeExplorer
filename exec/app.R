@@ -20,9 +20,6 @@ ui <- fluidPage(theme=shinytheme("flatly"),
     # Sidebar panel for inputs
     sidebarLayout(
         sidebarPanel(
-            shinyjs::useShinyjs(),
-            id = "side-panel",
-
 	    h2("Explore gene expression across datasets"),
 
 	    h4("Search for gene in database"),
@@ -211,17 +208,6 @@ server <- function(input, output) {
     })
     output$scatter.lfc <- renderPlot({
         scatterlfc()
-    })
-
-    observeEvent(input$gene, {
-        if (is.null(input$gene)){
-            shinyjs::diasable("gene.search")}
-	else{
-	    shinyjs::enable("gene.search")}
-    })
-
-    observeEvent(input$reset_input, {
-        shinyjs::reset("side-panel")
     })
 
 }
