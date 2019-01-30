@@ -55,6 +55,9 @@ ui <- fluidPage(theme=shinytheme("flatly"),
             h5("Dispay results table"),
 	    actionButton("show.results", "Tabulate"),
 
+	    h5("Export results to current directory"),
+            downloadButton("download.table", "Download"),
+
 	    h2("Compare results across datasets/contrasts"),
 	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
 	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
@@ -72,7 +75,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
               dataTableOutput("tabulate.results"),
               plotOutput("scatter.lfc", brush = "plot_brush"),
               verbatimTextOutput("gene.info")
-#              plotOutput("scatter.lfc")
+
               )
     )
 )
@@ -202,6 +205,10 @@ server <- function(input, output) {
         tabulate()
     })
 
+    output$download.table <- downloadHandler(
+	filename = paste(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".csv"
+        content = tabulate()
+    )
 
     df <- eventReactive(input$scatter.lfc, {
         buildComparisonSet(conn, input$dataset1, input$dataset2)
