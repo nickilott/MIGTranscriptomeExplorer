@@ -214,7 +214,7 @@ server <- function(input, output) {
     })
 
     observeEvent(is.null(input$gene), {
-        shinyj::stoggleState("gene.search")
+        shinyjs::toggleState("gene.search")
     })
 
     observeEvent(input$reset_input, {
