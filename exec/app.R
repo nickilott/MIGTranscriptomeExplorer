@@ -60,8 +60,6 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
 	    actionButton("scatter.lfc", "Scatterplot lfc"),
 
-            tags$hr(),
-            actionButton("reset_input", "Reset inputs")
         ),
 
     # Main panel for displaying outputs
