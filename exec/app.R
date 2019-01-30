@@ -28,7 +28,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
 
-            conditionalPanel(condition = "!(is.null('input.gene'))"
+            conditionalPanel(condition = "!(is.null('input.gene'))"),
             actionButton("gene.search", "get expression")),
 
 	    h4("Significant contrasts in database"),
