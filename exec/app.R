@@ -165,7 +165,7 @@ server <- function(input, output) {
         names(variables) <- variables
         selectInput("variable", "variable", variables)
     })
-    
+
     PCA <- eventReactive(input$PCA, {
         mat <- getMatrix(conn, input$choose.dataset)
         metadata <- getMetadata(conn, input$choose.dataset)
@@ -175,6 +175,7 @@ server <- function(input, output) {
         pc <- runPCA(mat)
         plotPrincipleComponents(pc, metadata, colourby=input$variable, pcs=pcs)
     })
+
     output$PCA <- renderPlot({
         PCA()
     })
@@ -199,11 +200,13 @@ server <- function(input, output) {
 
     output$gene.info.ma <- renderPrint({
 	brushedPoints(na.omit(df()), input$plot_brush_ma)          
+    })
 
     heatmap <- eventReactive(input$heatmap, {
         mat <- getDiffMatrix(conn, input$choose.dataset, input$ma.contrast, input$ma.lfc, 0.05)
     	heatmapMatrix(mat)
     })
+
     output$heatmap <- renderPlot({
         heatmap()
     })
@@ -211,9 +214,11 @@ server <- function(input, output) {
     tabulate <- eventReactive(input$show.results, {
         tabulateResults(conn, input$choose.dataset, input$ma.contrast)
     })
+
     output$tabulate.results <- renderDataTable({
         tabulate()
     })
+
     df <- eventReactive(input$scatter.lfc, {
         buildComparisonSet(conn, input$dataset1, input$dataset2)
     })
@@ -221,6 +226,7 @@ server <- function(input, output) {
     scatterlfc <- eventReactive(input$scatter.lfc, {
       scatterComparisons(na.omit(df()))
     })
+
     output$scatter.lfc <- renderPlot({
         scatterlfc()
     })
