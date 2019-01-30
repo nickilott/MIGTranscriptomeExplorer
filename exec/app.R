@@ -208,14 +208,14 @@ server <- function(input, output) {
     })
 
     scatterlfc <- eventReactive(input$scatter.lfc, {
-      scatterComparisons(df())
+      scatterComparisons(na.omit(df()))
     })
     output$scatter.lfc <- renderPlot({
         scatterlfc()
     })
 
     output$gene.info <- renderPrint({
-	brushedPoints(df(), input$plot_brush)          
+	brushedPoints(na.omit(df()), input$plot_brush)          
     })
 
 }
