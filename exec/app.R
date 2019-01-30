@@ -202,9 +202,10 @@ server <- function(input, output) {
         tabulate()
     })
 
-    df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
+    
     scatterlfc <- eventReactive(input$scatter.lfc, {
-	scatterComparisons(df)
+      df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
+      scatterComparisons(df)
     })
     output$scatter.lfc <- renderPlot({
         scatterlfc()
