@@ -201,6 +201,7 @@ heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
 #'
 #' Scatterplot fold changes between datasets/contrasts
 #' @param df data frame 
+#' @import ggrepel
 #' @export
 #' @examples
 #' scatterComparisons(df)
@@ -220,5 +221,6 @@ scatterComparisons <- function(df){
     p <- p + geom_hline(yintercept=c(-1, 1), colour="darkGrey", linetype="dashed")
     p <- p + geom_vline(xintercept=c(-1, 1), colour="darkGrey", linetype="dashed")
     
+
     return(p)
 }
