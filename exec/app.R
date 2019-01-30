@@ -206,9 +206,11 @@ server <- function(input, output) {
     })
 
     output$download.table <- downloadHandler(
-	filename = paste0(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".tsv"),
+	filename = function() {
+	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".tsv")
+	},
         content = function(file){
-	    write.table(tabulate(), file, sep="\t", quote=F)
+	    write.table(tabulate(), file, sep="\t", quote=F, row.names=F)
        }
     )
 
