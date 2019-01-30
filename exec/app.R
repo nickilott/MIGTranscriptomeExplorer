@@ -207,8 +207,6 @@ server <- function(input, output) {
         df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
     })
 
-    df <- builddf()
-
     scatterlfc <- eventReactive(input$scatter.lfc, {
       scatterComparisons(df)
     })
