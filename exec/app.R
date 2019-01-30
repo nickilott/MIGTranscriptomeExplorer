@@ -206,7 +206,7 @@ server <- function(input, output) {
     })
 
     output$download.table <- downloadHandler(
-	filename = paste(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".csv"
+	filename = paste0(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".csv"),
         content = tabulate()
     )
 
