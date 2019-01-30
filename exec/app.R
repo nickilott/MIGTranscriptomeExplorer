@@ -235,13 +235,16 @@ server <- function(input, output) {
 	brushedPoints(na.omit(df()), input$plot_brush)          
     })
 
+    ##############
     # downloads
+    ##############
+    
     output$download.ma <- downloadHandler(
 	filename = function() {
 	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "ma", ".pdf")
 	},
         content = function(file){
-	    ggsave(file, plot=output$MA)
+	    ggsave(file, plot=MA())
        }
     )
 
@@ -259,7 +262,7 @@ server <- function(input, output) {
 	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", dataset2, ".pdf")
 	},
         content = function(file){
-	    ggsave(file, plot=output$scatter.lfc)
+	    ggsave(file, plot=scatterlfc())
        }
     )
 }
