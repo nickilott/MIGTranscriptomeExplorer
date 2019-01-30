@@ -202,22 +202,22 @@ server <- function(input, output) {
         tabulate()
     })
 
-    
+
+    builddf <- eventReactive(input$scatter.lfc, {
+        df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
+    })
+
+    df <- builddf()
+
     scatterlfc <- eventReactive(input$scatter.lfc, {
-      df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
       scatterComparisons(df)
     })
     output$scatter.lfc <- renderPlot({
         scatterlfc()
     })
 
-    geneinfo <- eventReactive(input$scatter.lfc, {
-        df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
-        brushedPoints(df, input$plot_brush)
-    })
-
     output$gene.info <- renderPrint({
-	geneinfo()          
+	brushedPoints(df, input$plot_brush)          
     })
 
 }
