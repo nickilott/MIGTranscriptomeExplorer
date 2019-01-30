@@ -498,15 +498,15 @@ buildComparisonSet <- function(connection, dataset1, dataset2){
     tablename2 <- getTablename(tablename2, type="result")
     probe2gene2 <- getTablename(data2, type="probe2gene_map")
 
-    statement1 <- paste0('SELECT a.gene_name, AVG(b.l2fold) as l2fold FROM ', probe2gene1,  ' as a, ',  tablename1, ' as b ', 'WHERE a.probe==b.test_id GROUP BY a.gene_name')
+    statement1 <- paste0('SELECT a.gene_name, AVG(b.l2fold) as l2fold, b.padj as padj FROM ', probe2gene1,  ' as a, ',  tablename1, ' as b ', 'WHERE a.probe==b.test_id GROUP BY a.gene_name')
     l2fold1 <- dbGetQuery(connection, statement1)
 
-    statement2 <- paste0('SELECT a.gene_name, AVG(b.l2fold) as l2fold FROM ', probe2gene2,  ' as a, ',  tablename2, ' as b ', 'WHERE a.probe==b.test_id GROUP BY a.gene_name')
+    statement2 <- paste0('SELECT a.gene_name, AVG(b.l2fold) as l2fold, b.padj as padj FROM ', probe2gene2,  ' as a, ',  tablename2, ' as b ', 'WHERE a.probe==b.test_id GROUP BY a.gene_name')
     l2fold2 <- dbGetQuery(connection, statement2)
 
     df <- merge(l2fold1, l2fold2, by.x="gene_name", by.y="gene_name")
 
-    colnames(df) <- c("gene_name", dataset1, dataset2)
+    colnames(df) <- c("gene_name", paste0(dataset1, "_l2fold"), paste0(dataset2, "_l2fold"), paste0(dataset1, "_padj"), paste0(dataset2, "_padj"))
     return(df)
 
 }    
