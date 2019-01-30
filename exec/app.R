@@ -213,8 +213,11 @@ server <- function(input, output) {
         scatterlfc()
     })
 
-    observeEvent(is.null(input$gene), {
-        shinyjs::toggleState("gene.search")
+    observeEvent(input$gene.search, {
+        if (is.null(input$gene)),
+            shinyjs::hide("gene.search")
+	esle{
+	    shinyjs::show("gene.search")}
     })
 
     observeEvent(input$reset_input, {
