@@ -213,7 +213,7 @@ server <- function(input, output) {
         scatterlfc()
     })
 
-    observeEvent(input$gene.search, {
+    observeEvent(input$gene, {
         if (is.null(input$gene)){
             shinyjs::hide("gene.search")}
 	else{
