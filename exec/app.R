@@ -58,7 +58,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h2("Compare results across datasets/contrasts"),
 	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
 	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
-	    actionButton("scatter.lfc", "Scatterplot lfc"),
+	    actionButton("scatter.lfc", "Scatterplot lfc")
 
         ),
 
