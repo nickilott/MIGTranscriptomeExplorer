@@ -506,10 +506,10 @@ buildComparisonSet <- function(connection, dataset1, dataset2){
 
     df <- merge(l2fold1, l2fold2, by.x="gene_name", by.y="gene_name")
 
-    df$rk1 <- rank(df$l2fold1)
-    df$rk2 <- rank(df$l2fold2)
-    df$revrk1 <- order(rank(df$l2fold1), decreasing=TRUE)
-    df$revrk2 <- order(rank(df$l2fold2), decreasing=TRUE)
+    df$rk1 <- rank(df$l2fold)
+    df$rk2 <- rank(df$l2fold.1)
+    df$revrk1 <- order(rank(df$l2fold), decreasing=TRUE)
+    df$revrk2 <- order(rank(df$l2fold.1), decreasing=TRUE)
     df$rksum <- sum(df$rf1, df$rk2)
     df$revrksum <- sum(df$revrk1, df$revrk2)
 
