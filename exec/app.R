@@ -63,7 +63,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
 	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
 	    actionButton("scatter.lfc", "Scatterplot lfc"),
-            downloadButton("download.scatter", "Download"),
+            downloadButton("download.scatter", "Download")
 
         ),
 
