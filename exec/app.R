@@ -215,9 +215,9 @@ server <- function(input, output) {
 
     observeEvent(input$gene, {
         if (is.null(input$gene)){
-            shinyjs::hide("gene.search")}
+            shinyjs::diasable("gene.search")}
 	else{
-	    shinyjs::show("gene.search")}
+	    shinyjs::enable("gene.search")}
     })
 
     observeEvent(input$reset_input, {
