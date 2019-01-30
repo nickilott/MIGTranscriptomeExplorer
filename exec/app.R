@@ -50,6 +50,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h5("Thresholds"),
 	    numericInput("ma.lfc", label="lfc", value = 1),
 	    actionButton("MA", "MA plot"),
+	    downloadButton("download.ma", "Download"),
 	    actionButton("heatmap", "Heatmap"),
 
             h5("Dispay results table"),
@@ -62,6 +63,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
 	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
 	    actionButton("scatter.lfc", "Scatterplot lfc")
+            downloadButton("download.scatter", "Download"),
 
         ),
 
@@ -70,12 +72,12 @@ ui <- fluidPage(theme=shinytheme("flatly"),
               plotOutput("gene.expression"),
 	      dataTableOutput("significant.results"),
 	      plotOutput("PCA"),
-	      plotOutput("MA"),
-	      plotOutput("heatmap"),
+	      plotOutput("MA", brush = "plot_brush_ma"),
+              verbatimTextOutput("gene.info.ma"),
+              plotOutput("heatmap"),
               dataTableOutput("tabulate.results"),
               plotOutput("scatter.lfc", brush = "plot_brush"),
               verbatimTextOutput("gene.info")
-
               )
     )
 )
@@ -182,13 +184,21 @@ server <- function(input, output) {
         names(contrasts) <- contrasts
         selectInput("ma.contrast", "contrast", contrasts)
     })
-    MA <- eventReactive(input$MA, {
-        result <- getResultSet(conn, input$choose.dataset, input$ma.contrast)
-        plotMA(result, lfc=input$ma.lfc, title=paste(input$choose.dataset, input$ma.contrast, sep=": "))
+
+    ma.df <- eventReactive(input$MA, {
+        getResultSet(conn, input$choose.dataset, input$ma.contrast)
     })
+
+    MA <- eventReactive(input$MA, {
+        plotMA(ma.df(), lfc=input$ma.lfc, title=paste(input$choose.dataset, input$ma.contrast, sep=": "))
+    })
+
     output$MA <- renderPlot({
         MA()
     })
+
+    output$gene.info.ma <- renderPrint({
+	brushedPoints(na.omit(df()), input$plot_brush_ma)          
 
     heatmap <- eventReactive(input$heatmap, {
         mat <- getDiffMatrix(conn, input$choose.dataset, input$ma.contrast, input$ma.lfc, 0.05)
@@ -204,16 +214,6 @@ server <- function(input, output) {
     output$tabulate.results <- renderDataTable({
         tabulate()
     })
-
-    output$download.table <- downloadHandler(
-	filename = function() {
-	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".tsv")
-	},
-        content = function(file){
-	    write.table(tabulate(), file, sep="\t", quote=F, row.names=F)
-       }
-    )
-
     df <- eventReactive(input$scatter.lfc, {
         buildComparisonSet(conn, input$dataset1, input$dataset2)
     })
@@ -229,6 +229,33 @@ server <- function(input, output) {
 	brushedPoints(na.omit(df()), input$plot_brush)          
     })
 
+    # downloads
+    output$download.ma <- downloadHandler(
+	filename = function() {
+	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "ma", ".pdf")
+	},
+        content = function(file){
+	    ggsave(output@MA, file)
+       }
+    )
+
+    output$download.table <- downloadHandler(
+	filename = function() {
+	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "result", ".tsv")
+	},
+        content = function(file){
+	    write.table(tabulate(), file, sep="\t", quote=F, row.names=F)
+       }
+    )
+
+    output$scatter <- downloadHandler(
+	filename = function() {
+	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", dataset2, ".pdf")
+	},
+        content = function(file){
+	    ggsave(output$scatter.lfc, file)
+       }
+    )
 }
 
 shinyApp(ui, server)
