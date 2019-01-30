@@ -216,7 +216,7 @@ server <- function(input, output) {
     observeEvent(input$gene.search, {
         if (is.null(input$gene)){
             shinyjs::hide("gene.search")}
-	esle{
+	else{
 	    shinyjs::show("gene.search")}
     })
 
