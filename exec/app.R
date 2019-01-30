@@ -199,7 +199,7 @@ server <- function(input, output) {
     })
 
     output$gene.info.ma <- renderPrint({
-	brushedPoints(na.omit(df()), input$plot_brush_ma)          
+	brushedPoints(na.omit(ma.df()), input$plot_brush_ma)          
     })
 
     heatmap <- eventReactive(input$heatmap, {
@@ -241,7 +241,7 @@ server <- function(input, output) {
 	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "ma", ".pdf")
 	},
         content = function(file){
-	    ggsave(output@MA, file)
+	    ggsave(file, plot=output$MA)
        }
     )
 
@@ -259,7 +259,7 @@ server <- function(input, output) {
 	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", dataset2, ".pdf")
 	},
         content = function(file){
-	    ggsave(output$scatter.lfc, file)
+	    ggsave(file, plot=output$scatter.lfc)
        }
     )
 }
