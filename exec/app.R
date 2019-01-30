@@ -70,7 +70,9 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	      plotOutput("MA"),
 	      plotOutput("heatmap"),
               dataTableOutput("tabulate.results"),
-	      plotOutput("scatter.lfc")
+              plotOutput("scatter.lfc", brush = "plot_brush"),
+              verbatimTextOutput("gene.info")
+#              plotOutput("scatter.lfc")
               )
     )
 )
@@ -200,12 +202,16 @@ server <- function(input, output) {
         tabulate()
     })
 
+    df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
     scatterlfc <- eventReactive(input$scatter.lfc, {
-        df <- buildComparisonSet(conn, input$dataset1, input$dataset2)
 	scatterComparisons(df)
     })
     output$scatter.lfc <- renderPlot({
         scatterlfc()
+    })
+
+    output$gene.info <- renderPrint({
+          brushedPoints(df, input$plot_brush)
     })
 
 }
