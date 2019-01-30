@@ -27,7 +27,9 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
-            actionButton("gene.search", "get expression"),
+
+            conditionalPanel(condition = "!(is.null('input.gene'))"
+            actionButton("gene.search", "get expression")),
 
 	    h4("Significant contrasts in database"),
 	    h5("Specify thresholds"),
@@ -118,7 +120,7 @@ server <- function(input, output) {
     })
 
     output$gene.expression <- renderPlot({
-        expression()
+	expression()
     })
 
     #####################
