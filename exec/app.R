@@ -27,9 +27,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
-
-            conditionalPanel(condition = "!(is.null(input.gene))",
-            actionButton("gene.search", "get expression")),
+            actionButton("gene.search", "get expression"),
 
 	    h4("Significant contrasts in database"),
 	    h5("Specify thresholds"),
@@ -213,6 +211,10 @@ server <- function(input, output) {
     })
     output$scatter.lfc <- renderPlot({
         scatterlfc()
+    })
+
+    observeEvent(is.null(input$gene), {
+        shinyj::stoggleState("gene.search")
     })
 
     observeEvent(input$reset_input, {
