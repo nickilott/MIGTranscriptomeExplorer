@@ -45,6 +45,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h5("Colour by"),
 	    uiOutput("variable"),
 	    actionButton("PCA", "PCA"),
+	    downloadButton("download.pca", "Download"),
 
 	    h4("Differential expression results"),
 	    uiOutput("ma.contrast"),
@@ -239,7 +240,15 @@ server <- function(input, output) {
     ##############
     # downloads
     ##############
-    
+
+    output$download.ca <- downloadHandler(
+	filename = function() {
+	    paste0(input$choose.dataset, "_", "pca", ".pdf")
+	},
+        content = function(file){
+	    ggsave(file, plot=PCA())
+    })
+
     output$download.ma <- downloadHandler(
 	filename = function() {
 	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "ma", ".pdf")
