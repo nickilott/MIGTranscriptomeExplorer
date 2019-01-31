@@ -6,6 +6,7 @@ library(RSQLite)
 library(dplyr)
 library(shinythemes)
 library(shinyjs)
+library(ggplot2)
 
 # Define UI for MIGTranscriptomeExplorer app
 
