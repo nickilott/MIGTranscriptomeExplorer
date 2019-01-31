@@ -240,10 +240,10 @@ scatterComparisons <- function(df){
 vennComparisons <- function(df, lfc=1){
 
     gene.list1 <- df$gene_name[abs(df[,2]) > lfc & df[,4] < 0.05]
-    gene.list2 <- df$gene_name[abs(df[,3]) > lfc & df[,5] < 0.05]
+    gene.list2 <- df$gene_name[abs(df[,4]) > lfc & df[,5] < 0.05]
 
     names.list <- unlist(strsplit(colnames(df), "*_l2fold.*"))
-    names.list <- names.list[2:3]
+    names.list <- names.list[c(2,4)]
 
     names(gene.list1) <- names.list[1]
     names(gene.list2) <- names.list[2]
