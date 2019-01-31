@@ -246,8 +246,7 @@ server <- function(input, output) {
 	},
         content = function(file){
 	    ggsave(file, plot=MA())
-       }
-    )
+    })
 
     output$download.table <- downloadHandler(
 	filename = function() {
@@ -255,17 +254,15 @@ server <- function(input, output) {
 	},
         content = function(file){
 	    write.table(tabulate(), file, sep="\t", quote=F, row.names=F)
-       }
-    )
-
+    })
+    
     output$scatter <- downloadHandler(
 	filename = function() {
 	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", input$dataset2, ".pdf")
 	},
         content = function(file){
-	    ggsave(file, plot=scatterlfc())
-       }
-    )
+	    ggsave(file, plot=output$scatter.lfc)
+   })
 }
 
 shinyApp(ui, server)
