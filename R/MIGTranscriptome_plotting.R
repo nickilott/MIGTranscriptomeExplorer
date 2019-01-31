@@ -201,7 +201,6 @@ heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
 #'
 #' Scatterplot fold changes between datasets/contrasts
 #' @param df data frame 
-#' @import ggrepel
 #' @export
 #' @examples
 #' scatterComparisons(df)
