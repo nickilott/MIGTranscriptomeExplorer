@@ -260,7 +260,7 @@ server <- function(input, output) {
 
     output$scatter <- downloadHandler(
 	filename = function() {
-	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", dataset2, ".pdf")
+	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", input$dataset2, ".pdf")
 	},
         content = function(file){
 	    ggsave(file, plot=scatterlfc())
