@@ -187,11 +187,7 @@ server <- function(input, output) {
     })
 
     ma.df <- eventReactive(input$MA, {
-        res <- getResultSet(conn, input$choose.dataset, input$ma.contrast)
-        probe2gene <- getTablename(conn, input$choose.dataset, type="probe2gene_mapp")
-        rownames(probe2gene$probe)
-	res$gene_name <- probe2gene[res$test_id,]$gene_name
-        res
+        getResultSet(conn, input$choose.dataset, input$ma.contrast)
     })
 
     MA <- eventReactive(input$MA, {
