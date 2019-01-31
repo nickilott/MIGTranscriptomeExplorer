@@ -232,9 +232,10 @@ server <- function(input, output) {
     })
 
     venndiagram <- eventReactive(input$venn, {
-        vennComparisons(df, input$venn.lfc)
+        vennComparisons(df(), input$venn.lfc)
     })
 
+    observe({print(df)})
     output$venn <- renderPlot({
         venndiagram()
     })

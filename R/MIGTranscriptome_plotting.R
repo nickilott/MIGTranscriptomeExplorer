@@ -254,10 +254,11 @@ vennComparisons <- function(df, lfc=1){
     v <- venn.diagram(tovenn,
                       filename=NULL,
 		      fill=c("red4", "blue4"),
-		      alpha=c(0.5,0.5),
+                      alpha=c(0.5,0.5),
 		      fontfamily=c("sans", "sans", "sans"),
 		      cat.fontfamily=c("sans", "sans"),
-		      cat.pos=c(0, 90),
-		      cat.just=list(c(1,1), c(0,0)))
+		      cat.pos=c(0, 180),
+		      cat.just=list(c(1,1), c(0,1)),
+		      margin=c(0.2,0.2,0.2,0.2))
    grid.draw(v)
 }

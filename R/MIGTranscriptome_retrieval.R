@@ -325,6 +325,8 @@ getResultSet <- function(conn, dataset, contrast){
     statement <- paste0('SELECT * FROM ', '"', tablename, '"')
     dat <- dbGetQuery(conn, statement)
     probe2gene <- getTablename(dataset, type="probe2gene_map")
+    statement <- paste0('SELECT * FROM ', probe2gene)
+    probe2gene <- dbGetQuery(conn, statement) 
     rownames(probe2gene) <- probe2gene$probe
     dat$gene_name <- probe2gene[dat$test_id,]$gene_name
     return(dat)
