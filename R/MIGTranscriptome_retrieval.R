@@ -56,6 +56,7 @@ showDatasets <- function(connection){
 #' @param dataset dataset to base tablename prefix on
 #' @param type one of matrix, probe2gene_map, metadata
 #' @return string
+#' @export
 #' @examples
 #' getTablename("MIGTranscriptome_0001", type="matrix")
 
