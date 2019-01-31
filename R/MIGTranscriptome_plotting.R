@@ -208,10 +208,10 @@ heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
 scatterComparisons <- function(df){
 
     x <- df[,2]
-    y <- df[,3]
+    y <- df[,4]
 
     namex <- colnames(df)[2]
-    namey <- colnames(df)[3]
+    namey <- colnames(df)[4]
 
     df$d <- densCols(x, y, colramp = colorRampPalette(rev(rainbow(10, v = 0.5, s = 0.5, end = 4/6))))
     p <- ggplot(df) +
