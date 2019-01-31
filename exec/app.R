@@ -7,6 +7,7 @@ library(dplyr)
 library(shinythemes)
 library(shinyjs)
 library(ggplot2)
+library(VennDiagram)
 
 # Define UI for MIGTranscriptomeExplorer app
 
@@ -66,6 +67,9 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    actionButton("scatter.lfc", "Scatterplot lfc"),
             downloadButton("download.scatter", "Download")
 
+            h5("Venn diagram")
+	    numericInput("venn.lfc", "lfc")
+	    actionButton("venn", "venn diagram")
         ),
 
     # Main panel for displaying outputs
@@ -77,7 +81,8 @@ ui <- fluidPage(theme=shinytheme("flatly"),
               verbatimTextOutput("gene.info.ma"),
               dataTableOutput("tabulate.results"),
               plotOutput("scatter.lfc", brush = "plot_brush"),
-              verbatimTextOutput("gene.info")
+              verbatimTextOutput("gene.info"),
+	      plotOutput("venn")
               )
     )
 )
@@ -224,6 +229,14 @@ server <- function(input, output) {
 
     output$gene.info <- renderPrint({
 	brushedPoints(na.omit(df()), input$plot_brush)          
+    })
+
+    venndiagram <- eventReactive(input$venn, {
+        vennComparisons(df, input$venn.lfc)
+    })
+
+    output$venn <- renderPlot({
+        venndiagram()
     })
 
     ##############
