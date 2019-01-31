@@ -68,7 +68,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
             downloadButton("download.scatter", "Download"),
 
             h5("Venn diagram"),
-	    numericInput("venn.lfc", "lfc"),
+	    numericInput("venn.lfc", "lfc", value=1),
 	    actionButton("venn", "venn diagram")
         ),
 
