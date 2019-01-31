@@ -224,3 +224,36 @@ scatterComparisons <- function(df){
 
     return(p)
 }
+
+##################################################
+##################################################
+##################################################
+
+#' Venn diagram significant differences
+#'
+#' Venn diagram of overlap between two datasets based on thresholds
+#' @param df data frame of results 
+#' @import VennDiagram
+#' @export
+#' @examples
+#' vennComparisons(df, lfc)
+
+vennComparisons <- function(df, lfc=1){
+
+    gene.list1 <- df$gene_name[abs(df[,2]) > lfc & df[,4] < 0.05]
+    gene.list2 <- df$gene_name[abs(df[,3]) > lfc & df[,5] < 0.05]
+
+    names.list <- unlist(strsplit(colnames(df), "*_l2fold.*"))
+    names.list <- names.list[2:3]
+
+    names(gene.list1) <- names.list[1]
+    names(gene.list2) <- names.list[2]
+
+    v <- venn.diagram(list(gene.list1, gene.list2),
+                      filename=NULL,
+		      fill=c("red4", "blue4"),
+		      alpha=c(0.5,0.5),
+		      fontfamily=c("sans", "sans"),
+		      cat.fontfamily=c("sans", "sans"))
+   grid.draw(v)
+}
