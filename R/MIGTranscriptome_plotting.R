@@ -245,14 +245,19 @@ vennComparisons <- function(df, lfc=1){
     names.list <- unlist(strsplit(colnames(df), "*_l2fold.*"))
     names.list <- names.list[c(2,4)]
 
-    names(gene.list1) <- names.list[1]
-    names(gene.list2) <- names.list[2]
+    name1 <- names.list[1]
+    name2 <- names.list[2]
 
-    v <- venn.diagram(list(gene.list1, gene.list2),
+    tovenn <- list(gene.list1, gene.list2)
+    names(tovenn) <- c(name1, name2)
+
+    v <- venn.diagram(tovenn,
                       filename=NULL,
 		      fill=c("red4", "blue4"),
 		      alpha=c(0.5,0.5),
-		      fontfamily=c("sans", "sans"),
-		      cat.fontfamily=c("sans", "sans"))
+		      fontfamily=c("sans", "sans", "sans"),
+		      cat.fontfamily=c("sans", "sans"),
+		      cat.pos=c(0, 90),
+		      cat.just=list(c(1,1), c(0,0)))
    grid.draw(v)
 }
