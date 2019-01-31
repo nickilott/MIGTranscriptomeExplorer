@@ -73,18 +73,21 @@ ui <- fluidPage(theme=shinytheme("flatly"),
         ),
 
     # Main panel for displaying outputs
-    mainPanel(dataTableOutput("dataset.table"),
-              plotOutput("gene.expression"),
-	      dataTableOutput("significant.results"),
-	      plotOutput("PCA"),
-	      plotOutput("MA", brush = "plot_brush_ma"),
-              verbatimTextOutput("gene.info.ma"),
-              dataTableOutput("tabulate.results"),
-              plotOutput("scatter.lfc", brush = "plot_brush"),
-              verbatimTextOutput("gene.info"),
-	      plotOutput("venn")
-              )
-    )
+    mainPanel(
+              tabsetPanel(
+	          tabPanel("datasets", dataTableOutput("dataset.table")),
+                  tabPanel("expression across datasets", plotOutput("gene.expression"),
+	                                                 dataTableOutput("significant.results")),
+	          tabPanel("explore dataset", plotOutput("PCA"),
+	                                      plotOutput("MA", brush = "plot_brush_ma"),
+                                              verbatimTextOutput("gene.info.ma"),
+                                              dataTableOutput("tabulate.results")),
+                  tabPanel("compare datasets", plotOutput("scatter.lfc", brush = "plot_brush"),
+                                               verbatimTextOutput("gene.info"),
+	                                       plotOutput("venn"))
+                 )
+   )
+   )
 )
 
 
