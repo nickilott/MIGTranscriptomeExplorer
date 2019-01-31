@@ -231,11 +231,14 @@ server <- function(input, output) {
 	brushedPoints(na.omit(df()), input$plot_brush)          
     })
 
-    venndiagram <- eventReactive(input$venn, {
-        vennComparisons(df(), input$venn.lfc)
+    df.venn <- eventReactive(input$venn, {
+        buildComparisonSet(conn, input$dataset1, input$dataset2)
     })
 
-    observe({print(df)})
+    venndiagram <- eventReactive(input$venn, {
+        vennComparisons(df.venn(), input$venn.lfc)
+    })
+
     output$venn <- renderPlot({
         venndiagram()
     })
