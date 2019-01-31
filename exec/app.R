@@ -53,7 +53,6 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    numericInput("ma.lfc", label="lfc", value = 1),
 	    actionButton("MA", "MA plot"),
 	    downloadButton("download.ma", "Download"),
-	    actionButton("heatmap", "Heatmap"),
 
             h5("Dispay results table"),
 	    actionButton("show.results", "Tabulate"),
@@ -76,7 +75,6 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	      plotOutput("PCA"),
 	      plotOutput("MA", brush = "plot_brush_ma"),
               verbatimTextOutput("gene.info.ma"),
-              plotOutput("heatmap"),
               dataTableOutput("tabulate.results"),
               plotOutput("scatter.lfc", brush = "plot_brush"),
               verbatimTextOutput("gene.info")
@@ -189,7 +187,11 @@ server <- function(input, output) {
     })
 
     ma.df <- eventReactive(input$MA, {
-        getResultSet(conn, input$choose.dataset, input$ma.contrast)
+        res <- getResultSet(conn, input$choose.dataset, input$ma.contrast)
+        probe2gene <- getTablename(conn, input$choose.dataset, type="probe2gene_mapp")
+        rownames(probe2gene$probe)
+	res$gene_name <- probe2gene[res$test_id,]$gene_name
+        res
     })
 
     MA <- eventReactive(input$MA, {
@@ -202,15 +204,6 @@ server <- function(input, output) {
 
     output$gene.info.ma <- renderPrint({
 	brushedPoints(na.omit(ma.df()), input$plot_brush_ma)          
-    })
-
-    heatmap <- eventReactive(input$heatmap, {
-        mat <- getDiffMatrix(conn, input$choose.dataset, input$ma.contrast, input$ma.lfc, 0.05)
-    	heatmapMatrix(mat)
-    })
-
-    output$heatmap <- renderPlot({
-        heatmap()
     })
 
     tabulate <- eventReactive(input$show.results, {
@@ -241,7 +234,7 @@ server <- function(input, output) {
     # downloads
     ##############
 
-    output$download.ca <- downloadHandler(
+    output$download.pca <- downloadHandler(
 	filename = function() {
 	    paste0(input$choose.dataset, "_", "pca", ".pdf")
 	},
@@ -265,7 +258,7 @@ server <- function(input, output) {
 	    write.table(tabulate(), file, sep="\t", quote=F, row.names=F)
     })
     
-    output$scatter <- downloadHandler(
+    output$download.scatter <- downloadHandler(
 	filename = function() {
 	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", input$dataset2, ".pdf")
 	},
