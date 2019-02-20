@@ -120,7 +120,7 @@ server <- function(input, output) {
             expression <- getExpression(conn, dataset, input$gene) 
             expression <- na.omit(expression)
 	    metadata <- getMetadata(conn, dataset)
-            p <- plotGeneOfInterest(dataset, expression, metadata, variable="treatment")
+            p <- plotGeneOfInterest(dataset, expression, metadata, variable="group")
             grobs.list[[i]] <- p
         }
 	# hardcoded
