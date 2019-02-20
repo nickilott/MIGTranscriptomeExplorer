@@ -31,7 +31,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
         plot8 <- plot7 + theme(axis.text.y=element_blank())
         plot9 <- plot8 + theme(axis.ticks=element_blank())
         plot10 <- plot9 + theme(axis.title.x=element_blank())
-        plot10 <- plot10 + theme(axis.title.y=element_blank()) + ggtitle(dataset)
+        plot10 <- plot10 + theme(axis.title.y=element_blank()) + ggtitle(dataset) 
         return(plot10)
     }else{
 
@@ -57,7 +57,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
         plot5 <- plot4 + ggtitle(dataset)
         plot6 <- plot5 + facet_wrap(~test_id, nrow=1)
         plot7 <- plot6 + ylab("Expression level")
-        plot8 <- plot7 + scale_colour_manual(values=colours) + xlab("")
+        plot8 <- plot7 + scale_colour_manual(values=colours) + xlab("") + theme(axis.text.x=element_text(angle=90))
         return(plot8)
     }
 }
