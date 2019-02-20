@@ -22,7 +22,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
     # Sidebar panel for inputs
     sidebarLayout(
         sidebarPanel(
-	    h2("1.Explore gene expression across datasets"),
+	    h2("1. Explore gene expression across datasets"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
@@ -34,7 +34,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    numericInput("padj", label="padj", value = 0.05),
 	    actionButton("significant", "get significant"),
 
-	    h2("2.Explore specific dataset"),
+	    h2("2. Explore specific dataset"),
 	    h4("Choose dataset"),
 	    selectInput("choose.dataset", "Dataset:", choices=showDatasets(conn)$dataset),
 
@@ -61,7 +61,7 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h5("Export results to current directory"),
             downloadButton("download.table", "Download"),
 
-	    h2("3.Compare results across datasets/contrasts"),
+	    h2("3. Compare results across datasets/contrasts"),
 	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
 	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
 	    actionButton("scatter.lfc", "Scatterplot lfc"),
@@ -75,14 +75,14 @@ ui <- fluidPage(theme=shinytheme("flatly"),
     # Main panel for displaying outputs
     mainPanel(
               tabsetPanel(
-	          tabPanel("datasets", dataTableOutput("dataset.table")),
-                  tabPanel("1.Expression across datasets", plotOutput("gene.expression", height=800),
+	          tabPanel("Datasets", dataTableOutput("dataset.table")),
+                  tabPanel("1. Expression across datasets", plotOutput("gene.expression", height=800),
 	                                                 dataTableOutput("significant.results")),
-	          tabPanel("2.Explore dataset", plotOutput("PCA"),
+	          tabPanel("2. Explore dataset", plotOutput("PCA"),
 	                                      plotOutput("MA", brush = "plot_brush_ma"),
                                               verbatimTextOutput("gene.info.ma"),
                                               dataTableOutput("tabulate.results")),
-                  tabPanel("3.Compare datasets", plotOutput("scatter.lfc", brush = "plot_brush"),
+                  tabPanel("3. Compare datasets", plotOutput("scatter.lfc", brush = "plot_brush"),
                                                verbatimTextOutput("gene.info"),
 	                                       plotOutput("venn"))
                  )
