@@ -45,7 +45,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
         mat.m <- melt(mat)
 
         # add metadata
-        mat.m$covariate <- rep(metadata[,variable], nrow(mat))
+        mat.m$covariate <- metadata[mat.m$variable, variable]
 
         colours <- rainbow(length(unique(metadata[,variable])), s=0.7, v=0.6)
 
