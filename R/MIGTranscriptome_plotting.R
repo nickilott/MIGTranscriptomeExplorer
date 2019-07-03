@@ -96,7 +96,7 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none
     pca$condition <- metadata[,colourby]}
 
     # add shape
-    if (shape == "none"){
+    if (shapeby == "none"){
         pca$shape <- "none"}else{
     pca$shape <- metadata[,shapeby]}
 
