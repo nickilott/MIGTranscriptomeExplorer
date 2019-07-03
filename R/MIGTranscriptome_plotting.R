@@ -76,7 +76,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
 #' @examples
 #' plotPCA(PCA(mat))
 
-plotPrincipleComponents <- function(pc, metadata, colourby="none", continuous=FALSE,  pcs=c("PC1", "PC2")){
+plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none", continuous=FALSE,  pcs=c("PC1", "PC2")){
 
     # covariate must be in same order as pc rownames
 
@@ -93,8 +93,12 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", continuous=FA
     # add conditions
     pca$condition <- metadata[,colourby]
 
+    # add shape
+    pca$shape <- metadata[,shapeby]
+
     if (continuous==FALSE){
        pca$condition <- factor(pca$condition, levels=unique(pca$condition))
+
     }
 
     # plot
@@ -112,7 +116,7 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", continuous=FA
     n <- length(unique(pca$condition))
     colours <- rainbow(n, s=0.7, v=0.6)
     
-    plot1 <- ggplot(pca, aes_string(x=pc1, y=pc2, group="condition", colour="condition"))
+    plot1 <- ggplot(pca, aes_string(x=pc1, y=pc2, group="condition", colour="condition", shape="shape"))
     plot2 <- plot1 + geom_point(size=3)
     plot3 <- plot2 + theme_bw() 
     plot4 <- plot3 + xlab(xlabel) + ylab(ylabel)
