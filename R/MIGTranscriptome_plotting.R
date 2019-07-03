@@ -91,14 +91,17 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none
     pca <- data.frame(pc$x)
 
     # add conditions
-    pca$condition <- metadata[,colourby]
+    if (colourby == "none"){
+        pca$condition <- "none"}else{
+    pca$condition <- metadata[,colourby]}
 
     # add shape
-    pca$shape <- metadata[,shapeby]
+    if (shape == "none"){
+        pca$shape <- "none"}else{
+    pca$shape <- metadata[,shapeby]}
 
     if (continuous==FALSE){
        pca$condition <- factor(pca$condition, levels=unique(pca$condition))
-
     }
 
     # plot
