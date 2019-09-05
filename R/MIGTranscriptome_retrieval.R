@@ -345,9 +345,9 @@ getResultSet <- function(conn, dataset, contrast){
 #' @examples
 #' runPCA(df)
 
-runPCA <- function(df){
+runPCA <- function(df, scale=TRUE){
 
-    pc <- prcomp(t(df), scale=TRUE)
+    pc <- prcomp(t(df), scale=scale)
     return (pc)
 }
 
