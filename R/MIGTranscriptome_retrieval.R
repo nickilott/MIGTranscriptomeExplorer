@@ -125,6 +125,7 @@ convertGene <- function(gene){
 #' @param dataset string (dataset to retrieve ids from)
 #' @param gene gene to search for matching probes/ensembl ids
 #' @return vector of probes/ensembl gene ids
+#' @export
 #' @examples
 #' getProbes(connect(), "MIGTranscriptome_0001", "S100a9")
 
@@ -346,7 +347,7 @@ getResultSet <- function(conn, dataset, contrast){
 
 runPCA <- function(df){
 
-    pc <- prcomp(t(df))
+    pc <- prcomp(t(df), scale=TRUE)
     return (pc)
 }
 
