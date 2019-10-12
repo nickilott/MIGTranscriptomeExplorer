@@ -75,13 +75,13 @@ ui <- fluidPage(theme=shinytheme("flatly"),
     # Main panel for displaying outputs
     mainPanel(
               tabsetPanel(
-	          tabPanel("Datasets", dataTableOutput("dataset.table")),
+	          tabPanel("Datasets", DT::dataTableOutput("dataset.table")),
                   tabPanel("1. Expression across datasets", plotOutput("gene.expression", height=800),
-	                                                 dataTableOutput("significant.results")),
+	                                                 DT::dataTableOutput("significant.results")),
 	          tabPanel("2. Explore dataset", plotOutput("PCA"),
 	                                      plotOutput("MA", brush = "plot_brush_ma"),
                                               verbatimTextOutput("gene.info.ma"),
-                                              dataTableOutput("tabulate.results")),
+                                              DT::dataTableOutput("tabulate.results")),
                   tabPanel("3. Compare datasets", plotOutput("scatter.lfc", brush = "plot_brush"),
                                                verbatimTextOutput("gene.info"),
 	                                       plotOutput("venn"))
@@ -102,7 +102,7 @@ server <- function(input, output) {
     # displaying datasets
     ######################
 
-    output$dataset.table <- renderDataTable({
+    output$dataset.table <- DT::renderDataTable({
         showDatasets(conn)
     })
 
@@ -161,7 +161,7 @@ server <- function(input, output) {
         df.out <- bind_rows(dfs.list)
     })
 
-    output$significant.results <- renderDataTable({
+    output$significant.results <- DT::renderDataTable({
         significant()
     })
 
@@ -214,7 +214,7 @@ server <- function(input, output) {
         tabulateResults(conn, input$choose.dataset, input$ma.contrast)
     })
 
-    output$tabulate.results <- renderDataTable({
+    output$tabulate.results <- DT::renderDataTable({
         tabulate()
     })
 
