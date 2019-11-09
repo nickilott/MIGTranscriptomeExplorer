@@ -124,7 +124,7 @@ server <- function(input, output) {
             grobs.list[[i]] <- p
         }
 	# hardcoded
-        grid.arrange(grobs=grobs.list, nrow=3, ncol=2)
+        grid.arrange(grobs=grobs.list, nrow=3, ncol=3)
     })
 
     output$gene.expression <- renderPlot({
