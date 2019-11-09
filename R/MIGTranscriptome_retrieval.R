@@ -300,6 +300,7 @@ getSignificant <- function(connection, dataset, contrast, lfc, padj, gene){
     {
     significant$dataset <- dataset
     significant <- significant[, c("dataset", "test_id", "l2fold", "padj")]
+    significant$test_id <- as.character(significant$test_id)
     }
     return(significant)		
 }
