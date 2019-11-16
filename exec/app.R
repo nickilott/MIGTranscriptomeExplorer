@@ -45,7 +45,9 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 						"PC2 vs. PC3" = "PC2_PC3")),
 	    h5("Colour by"),
 	    uiOutput("variable"),
-	    actionButton("PCA", "PCA"),
+	    h5("Shape by"),
+	    uiOutput("variable.shape"),
+            actionButton("PCA", "PCA"),
 	    downloadButton("download.pca", "Download"),
 
 	    h4("Differential expression results"),
@@ -120,7 +122,7 @@ server <- function(input, output) {
             expression <- getExpression(conn, dataset, input$gene) 
             expression <- na.omit(expression)
 	    metadata <- getMetadata(conn, dataset)
-            p <- plotGeneOfInterest(dataset, expression, metadata, variable="group")
+            p <- plotGeneOfInterest(dataset, expression, metadata, variable="group") + theme(legend.position="none")
             grobs.list[[i]] <- p
         }
 	# hardcoded
@@ -174,14 +176,20 @@ server <- function(input, output) {
         selectInput("variable", "variable", variables)
     })
 
+    output$variable.shape <- renderUI({
+        variables <- append("none", getMetadataList(conn, input$choose.dataset))
+        names(variables) <- variables
+        selectInput("variable.shape", "variable", variables)
+    })
+
     PCA <- eventReactive(input$PCA, {
         mat <- getMatrix(conn, input$choose.dataset)
         metadata <- getMetadata(conn, input$choose.dataset)
         metadata <- sortMetadata(mat, metadata)
         metadata$none <- "none"
 	pcs <- unlist(strsplit(input$PCs, "_"))
-        pc <- runPCA(mat)
-        plotPrincipleComponents(pc, metadata, colourby=input$variable, pcs=pcs)
+        pc <- runPCA(mat, scale=FALSE)
+        plotPrincipleComponents(pc, metadata, colourby=input$variable, shapeby=input$variable.shape, pcs=pcs)
     })
 
     output$PCA <- renderPlot({
