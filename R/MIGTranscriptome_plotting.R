@@ -76,7 +76,7 @@ plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
 #' @examples
 #' plotPCA(PCA(mat))
 
-plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none", continuous=FALSE,  pcs=c("PC1", "PC2")){
+plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none", group="none", continuous=FALSE,  pcs=c("PC1", "PC2")){
 
     # covariate must be in same order as pc rownames
 
@@ -100,6 +100,10 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none
         pca$shape <- "none"}else{
     pca$shape <- metadata[,shapeby]}
 
+    if (group == "none"){
+        pca$group <- "none"}else{
+    pca$group <- metadata[,group]}
+
     if (continuous==FALSE){
        pca$condition <- factor(pca$condition, levels=unique(pca$condition))
     }
@@ -119,7 +123,7 @@ plotPrincipleComponents <- function(pc, metadata, colourby="none", shapeby="none
     n <- length(unique(pca$condition))
     colours <- rainbow(n, s=0.7, v=0.6)
     
-    plot1 <- ggplot(pca, aes_string(x=pc1, y=pc2, group="condition", colour="condition", shape="shape"))
+    plot1 <- ggplot(pca, aes_string(x=pc1, y=pc2, group="group", colour="condition", shape="shape"))
     plot2 <- plot1 + geom_point(size=3)
     plot3 <- plot2 + theme_bw() 
     plot4 <- plot3 + xlab(xlabel) + ylab(ylabel)
@@ -257,6 +261,9 @@ vennComparisons <- function(df, lfc=1){
 
     gene.list1 <- df$gene_name[abs(df[,2]) > lfc & df[,3] < 0.05]
     gene.list2 <- df$gene_name[abs(df[,4]) > lfc & df[,5] < 0.05]
+
+    gene.list1 <- na.omit(gene.list1)
+    gene.list3 <- na.omit(gene.list2)
 
     names.list <- unlist(strsplit(colnames(df), "*_l2fold.*"))
     names.list <- names.list[c(2,4)]
