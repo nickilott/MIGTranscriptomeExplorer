@@ -515,7 +515,7 @@ buildComparisonSet <- function(connection, dataset1, dataset2){
     df <- merge(l2fold1, l2fold2, by.x="gene_name", by.y="gene_name")
 
     colnames(df) <- c("gene_name", paste0(dataset1, "_l2fold"), paste0(dataset1, "_padj"), paste0(dataset2, "_l2fold"), paste0(dataset2, "_padj"))
-    return(df)
+    return(na.omit(df))
 
 }    
 
