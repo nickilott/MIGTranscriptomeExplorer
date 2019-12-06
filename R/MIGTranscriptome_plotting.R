@@ -18,6 +18,9 @@ library(reshape)
 
 plotGeneOfInterest <- function(dataset, mat, metadata, variable="treatment"){
 
+    # reorder
+    mat <- mat[,metadata$sample]
+
     # plot for if there's no data
     if (nrow(mat) == 0){
         df <- data.frame(x=1, y=1, text.output="No data")
