@@ -11,35 +11,62 @@ library(VennDiagram)
 
 # Define UI for MIGTranscriptomeExplorer app
 
-db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
-conn <- connect(db=db)
+powrie.db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
+powrie.conn <- connect(db=powrie.db)
+
+powrie.choices <- c("MIGTranscriptome_0001",
+                    "MIGTranscriptome_0002",
+		    "MIGTranscriptome_0003",
+		    "MIGTranscriptome_0004",
+		    "MIGTranscriptome_0005",
+		    "MIGTranscriptome_0006",
+		    "MIGTranscriptome_0007",
+		    "MIGTranscriptome_0008",
+		    "MIGTranscriptome_0009")
+
+crc.choices <- c("MIGTranscriptome_0010",
+                 "MIGTranscriptome_0011",
+		 "MIGTranscriptome_0013",
+		 "MIGTranscriptome_0014")
 
 ui <- fluidPage(theme=shinytheme("flatly"),
-  
+    useShinyjs(),
     # App title
     titlePanel("MIGTranscriptomeExplorer"),
   
     # Sidebar panel for inputs
     sidebarLayout(
         sidebarPanel(
+            h1("Choose collection"),
+            radioButtons("collection", "Collection:", c("Powrie DB", "CRC DB"), selected="Powrie DB"),
+            uiOutput("conn"),
+
 	    h2("1. Explore gene expression across datasets"),
 
 	    h4("Search for gene in database"),
 	    textInput("gene", label="Gene:", value = ""),
             actionButton("gene.search", "get expression"),
 
-	    h4("Significant contrasts in database"),
-	    h5("Specify thresholds"),
-	    numericInput("lfc", label="lfc:", value = 0),
-	    numericInput("padj", label="padj", value = 0.05),
-	    actionButton("significant", "get significant"),
+
+            conditionalPanel(
+	        condition = "input.collection == 'Powrie DB'",
+                h4("Significant contrasts in database"),
+	        h5("Specify thresholds"),
+	        numericInput("lfc", label="lfc:", value = 0),
+	        numericInput("padj", label="padj", value = 0.05),
+	        actionButton("significant", "get significant")),
 
 	    h2("2. Explore specific dataset"),
 	    h4("Choose dataset"),
-	    selectInput("choose.dataset", "Dataset:", choices=showDatasets(conn)$dataset),
+	    conditionalPanel(
+	        condition = "input.collection == 'Powrie DB'",
+		selectInput("choose.dataset", "Dataset:", choices = powrie.choices)),
+
+            conditionalPanel(
+	        condition = "input.collection == 'CRC DB'",
+		selectInput("choose.dataset2", "Dataset:", choices = crc.choices)),
 
 	    h4("Principle Components Analysis"),
-
 	    selectInput("PCs", "PC:", choices=c("PC1 vs. PC2" = "PC1_PC2",
 	                                        "PC1 vs. PC3" = "PC1_PC3",
 						"PC2 vs. PC3" = "PC2_PC3")),
@@ -48,30 +75,35 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	    h5("Shape by"),
 	    uiOutput("variable.shape"),
             actionButton("PCA", "PCA"),
+	    actionButton("clearpca", "Clear"),
 	    downloadButton("download.pca", "Download"),
 
-	    h4("Differential expression results"),
-	    uiOutput("ma.contrast"),
-	    h5("Thresholds"),
-	    numericInput("ma.lfc", label="lfc", value = 1),
-	    actionButton("MA", "MA plot"),
-	    downloadButton("download.ma", "Download"),
+            conditionalPanel(
+	        condition = "input.collection == 'Powrie DB'",
 
-            h5("Dispay results table"),
-	    actionButton("show.results", "Tabulate"),
+                h4("Differential expression results"),
+                uiOutput("ma.contrast"),
+	        h5("Thresholds"),
+	        numericInput("ma.lfc", label="lfc", value = 1),
+	        actionButton("MA", "MA plot"),
+	        actionButton("clearma", "Clear"),
+	        downloadButton("download.ma", "Download"),
 
-	    h5("Export results to current directory"),
-            downloadButton("download.table", "Download"),
+                h5("Dispay results table"),
+	        actionButton("show.results", "Tabulate"),
 
-	    h2("3. Compare results across datasets/contrasts"),
-	    selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(conn)),
-	    selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(conn)),
-	    actionButton("scatter.lfc", "Scatterplot lfc"),
-            downloadButton("download.scatter", "Download"),
+	        h5("Export results to current directory"),
+                downloadButton("download.table", "Download"),
 
-            h5("Venn diagram"),
-	    numericInput("venn.lfc", "lfc", value=1),
-	    actionButton("venn", "venn diagram")
+	        h2("3. Compare results across datasets/contrasts"),
+	        selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(powrie.conn)),
+	        selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(powrie.conn)),
+	        actionButton("scatter.lfc", "Scatterplot lfc"),
+                downloadButton("download.scatter", "Download"),
+
+                h5("Venn diagram"),
+	        numericInput("venn.lfc", "lfc", value=1),
+	        actionButton("venn", "venn diagram")),
         ),
 
     # Main panel for displaying outputs
@@ -80,8 +112,8 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 	          tabPanel("Datasets", DT::dataTableOutput("dataset.table")),
                   tabPanel("1. Expression across datasets", plotOutput("gene.expression", height=800),
 	                                                 DT::dataTableOutput("significant.results")),
-	          tabPanel("2. Explore dataset", plotOutput("PCA"),
-	                                      plotOutput("MA", brush = "plot_brush_ma"),
+	          tabPanel("2. Explore dataset", plotOutput("PC"),
+	                                      plotOutput("MAPlt", brush = "plot_brush_ma"),
                                               verbatimTextOutput("gene.info.ma"),
                                               DT::dataTableOutput("tabulate.results")),
                   tabPanel("3. Compare datasets", plotOutput("scatter.lfc", brush = "plot_brush"),
@@ -93,19 +125,29 @@ ui <- fluidPage(theme=shinytheme("flatly"),
 )
 
 
-
-db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
-conn <- connect(db=db)
-
 # Define server logic
 server <- function(input, output) {
 
+    ######################
+    # Choosing collection
+    ######################
+    conn = reactive({
+        if (input$collection == "Powrie DB"){
+            db <- system.file("data/csvdb", package="MIGTranscriptomeExplorer")
+        }
+        else if (input$collection == "CRC DB"){
+            db <- system.file("data/CRCDB", package="MIGTranscriptomeExplorer")
+        }
+    return(connect(db=db) )
+    })
+
+	
     ######################
     # displaying datasets
     ######################
 
     output$dataset.table <- DT::renderDataTable({
-        showDatasets(conn)
+        showDatasets(conn())
     })
 
     #####################
@@ -114,14 +156,14 @@ server <- function(input, output) {
     expression <- eventReactive(input$gene.search, {
 
         statement <- 'SELECT dataset FROM reference'
-        datasets <- dbGetQuery(conn, statement)$dataset
+        datasets <- dbGetQuery(conn(), statement)$dataset
 
         grobs.list <- list()
         for (i in 1:length(datasets)){
             dataset <- datasets[i]
-            expression <- getExpression(conn, dataset, input$gene) 
+            expression <- getExpression(conn(), dataset, input$gene) 
             expression <- na.omit(expression)
-	    metadata <- getMetadata(conn, dataset)
+	    metadata <- getMetadata(conn(), dataset)
             p <- plotGeneOfInterest(dataset, expression, metadata, variable="group") + theme(legend.position="none")
             grobs.list[[i]] <- p
         }
@@ -139,7 +181,7 @@ server <- function(input, output) {
     significant <- eventReactive(input$significant, {
 
         statement <- 'SELECT dataset FROM reference'
-        datasets <- dbGetQuery(conn, statement)$dataset
+        datasets <- dbGetQuery(conn(), statement)$dataset
 
         dfs.list <- list()
         idx <- 1
@@ -147,12 +189,12 @@ server <- function(input, output) {
             dataset <- datasets[i]
 
 	    # get the contrasts for the dataset
-	    contrasts <- getContrasts(conn, dataset)
+	    contrasts <- getContrasts(conn(), dataset)
 
 	    # iterate over contrasts
 	    for (j in 1:length(contrasts)){
                 contrast <- contrasts[j]
-                significant <- getSignificant(conn, dataset, contrast, input$lfc, input$padj, input$gene)
+                significant <- getSignificant(conn(), dataset, contrast, input$lfc, input$padj, input$gene)
 	        if (!(is.na(significant)) > 0){
 	            significant$contrast <- contrast
 	            dfs.list[[idx]] <- significant
@@ -171,20 +213,32 @@ server <- function(input, output) {
     # plots
     #####################
     output$variable <- renderUI({
-        variables <- append("none", getMetadataList(conn, input$choose.dataset))
+        if (input$collection == "Powrie DB"){
+            dataset = input$choose.dataset}
+        else if (input$collection == "CRC DB"){
+            dataset = input$choose.dataset2}
+        variables <- append("none", getMetadataList(conn(), dataset))
         names(variables) <- variables
         selectInput("variable", "variable", variables)
     })
 
     output$variable.shape <- renderUI({
-        variables <- append("none", getMetadataList(conn, input$choose.dataset))
+        if (input$collection == "Powrie DB"){
+            dataset = input$choose.dataset}
+        else if (input$collection == "CRC DB"){
+            dataset = input$choose.dataset2}
+        variables <- append("none", getMetadataList(conn(), dataset))
         names(variables) <- variables
         selectInput("variable.shape", "variable", variables)
     })
 
-    PCA <- eventReactive(input$PCA, {
-        mat <- getMatrix(conn, input$choose.dataset)
-        metadata <- getMetadata(conn, input$choose.dataset)
+    PC <- eventReactive(input$PCA, {
+        if (input$collection == "Powrie DB"){
+            dataset = input$choose.dataset}
+        else if (input$collection == "CRC DB"){
+            dataset = input$choose.dataset2}
+        mat <- getMatrix(conn(), dataset)
+        metadata <- getMetadata(conn(), dataset)
         metadata <- sortMetadata(mat, metadata)
         metadata$none <- "none"
 	pcs <- unlist(strsplit(input$PCs, "_"))
@@ -192,26 +246,42 @@ server <- function(input, output) {
         plotPrincipleComponents(pc, metadata, colourby=input$variable, shapeby=input$variable.shape, pcs=pcs)
     })
 
-    output$PCA <- renderPlot({
-        PCA()
+    output$PC <- renderPlot({
+        PC()
+    })
+
+    observeEvent(input$PCA, {
+        show("PC")
+    })
+
+    observeEvent(input$clearpca, {
+        hide("PC")
     })
 
     output$ma.contrast <- renderUI({
-        contrasts <- getContrasts(conn, input$choose.dataset)
+        contrasts <- getContrasts(conn(), input$choose.dataset)
         names(contrasts) <- contrasts
         selectInput("ma.contrast", "contrast", contrasts)
     })
 
     ma.df <- eventReactive(input$MA, {
-        getResultSet(conn, input$choose.dataset, input$ma.contrast)
+        getResultSet(conn(), input$choose.dataset, input$ma.contrast)
     })
 
-    MA <- eventReactive(input$MA, {
+    MAPlt <- eventReactive(input$MA, {
         plotMA(ma.df(), lfc=input$ma.lfc, title=paste(input$choose.dataset, input$ma.contrast, sep=": "))
     })
 
-    output$MA <- renderPlot({
-        MA()
+    output$MAPlt <- renderPlot({
+        MAPlt()
+    })
+
+    observeEvent(input$MA, {
+        show("MAPlt")
+    })
+
+    observeEvent(input$clearma, {
+        hide("MAPlt")
     })
 
     output$gene.info.ma <- renderPrint({
@@ -219,7 +289,7 @@ server <- function(input, output) {
     })
 
     tabulate <- eventReactive(input$show.results, {
-        tabulateResults(conn, input$choose.dataset, input$ma.contrast)
+        tabulateResults(conn(), input$choose.dataset, input$ma.contrast)
     })
 
     output$tabulate.results <- DT::renderDataTable({
@@ -227,7 +297,7 @@ server <- function(input, output) {
     })
 
     df <- eventReactive(input$scatter.lfc, {
-        buildComparisonSet(conn, input$dataset1, input$dataset2)
+        buildComparisonSet(conn(), input$dataset1, input$dataset2)
     })
 
     scatterlfc <- eventReactive(input$scatter.lfc, {
@@ -243,7 +313,7 @@ server <- function(input, output) {
     })
 
     df.venn <- eventReactive(input$venn, {
-        buildComparisonSet(conn, input$dataset1, input$dataset2)
+        buildComparisonSet(conn(), input$dataset1, input$dataset2)
     })
 
     venndiagram <- eventReactive(input$venn, {
@@ -263,7 +333,7 @@ server <- function(input, output) {
 	    paste0(input$choose.dataset, "_", "pca", ".pdf")
 	},
         content = function(file){
-	    ggsave(file, plot=PCA())
+	    ggsave(file, plot=PC())
     })
 
     output$download.ma <- downloadHandler(
@@ -271,7 +341,7 @@ server <- function(input, output) {
 	    paste0(input$choose.dataset, "__", input$ma.contrast, "_", "ma", ".pdf")
 	},
         content = function(file){
-	    ggsave(file, plot=MA())
+	    ggsave(file, plot=MAPlt())
     })
 
     output$download.table <- downloadHandler(
