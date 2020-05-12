@@ -357,7 +357,7 @@ server <- function(input, output) {
 	    paste0(input$choose.dataset, "_", input$dataset1, "_vs_", input$dataset2, ".pdf")
 	},
         content = function(file){
-	    ggsave(file, plot=output$scatter.lfc)
+	    ggsave(file, plot=scatterlfc())
    })
 }
 
