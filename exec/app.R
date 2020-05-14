@@ -29,101 +29,122 @@ crc.choices <- c("MIGTranscriptome_0010",
 		 "MIGTranscriptome_0013",
 		 "MIGTranscriptome_0014")
 
-ui <- fluidPage(theme=shinytheme("flatly"),
+ui <- fluidPage(theme=shinytheme("spacelab"),
     useShinyjs(),
     # App title
     titlePanel("MIGTranscriptomeExplorer"),
-  
-    # Sidebar panel for inputs
-    sidebarLayout(
-        sidebarPanel(
-            h1("Choose collection"),
-            radioButtons("collection", "Collection:", c("Powrie DB", "CRC DB"), selected="Powrie DB"),
-            uiOutput("conn"),
 
-	    h2("1. Explore gene expression across datasets"),
-
-	    h4("Search for gene in database"),
-	    textInput("gene", label="Gene:", value = ""),
-            actionButton("gene.search", "get expression"),
-
-
-            conditionalPanel(
-	        condition = "input.collection == 'Powrie DB'",
-                h4("Significant contrasts in database"),
-	        h5("Specify thresholds"),
-	        numericInput("lfc", label="lfc:", value = 0),
-	        numericInput("padj", label="padj", value = 0.05),
-	        actionButton("significant", "get significant")),
-
-	    h2("2. Explore specific dataset"),
-	    h4("Choose dataset"),
-	    conditionalPanel(
-	        condition = "input.collection == 'Powrie DB'",
-		selectInput("choose.dataset", "Dataset:", choices = powrie.choices)),
-
-            conditionalPanel(
-	        condition = "input.collection == 'CRC DB'",
-		selectInput("choose.dataset2", "Dataset:", choices = crc.choices)),
-
-	    h4("Principle Components Analysis"),
-	    selectInput("PCs", "PC:", choices=c("PC1 vs. PC2" = "PC1_PC2",
-	                                        "PC1 vs. PC3" = "PC1_PC3",
-						"PC2 vs. PC3" = "PC2_PC3")),
-	    h5("Colour by"),
-	    uiOutput("variable"),
-	    h5("Shape by"),
-	    uiOutput("variable.shape"),
-            actionButton("PCA", "PCA"),
-	    actionButton("clearpca", "Clear"),
-	    downloadButton("download.pca", "Download"),
-
-            conditionalPanel(
-	        condition = "input.collection == 'Powrie DB'",
-
-                h4("Differential expression results"),
-                uiOutput("ma.contrast"),
-	        h5("Thresholds"),
-	        numericInput("ma.lfc", label="lfc", value = 1),
-	        actionButton("MA", "MA plot"),
-	        actionButton("clearma", "Clear"),
-	        downloadButton("download.ma", "Download"),
-
-                h5("Dispay results table"),
-	        actionButton("show.results", "Tabulate"),
-
-	        h5("Export results to current directory"),
-                downloadButton("download.table", "Download"),
-
-	        h2("3. Compare results across datasets/contrasts"),
-	        selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(powrie.conn)),
-	        selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(powrie.conn)),
-	        actionButton("scatter.lfc", "Scatterplot lfc"),
-                downloadButton("download.scatter", "Download"),
-
-                h5("Venn diagram"),
-	        numericInput("venn.lfc", "lfc", value=1),
-	        actionButton("venn", "venn diagram")),
+    tabsetPanel(id="tabs",
+        tabPanel("Datasets", fluid=TRUE,
+	    sidebarLayout(
+	        sidebarPanel(
+		    h1("Choose collection"),
+                    radioButtons("collection", "Collection:", c("Powrie DB", "CRC DB"), selected="Powrie DB"),
+                    uiOutput("conn")
+		),
+		mainPanel(DT::dataTableOutput("dataset.table")
+		)
+            )
         ),
+        tabPanel("1. Expression across datasets", fluid=TRUE,
+	    sidebarLayout(
+	        sidebarPanel(h2("1. Explore gene expression across datasets"),
+ 	            h4("Search for gene in database"),
+	            textInput("gene", label="Gene:", value = ""),
+                    actionButton("gene.search", "get expression"),
+	            actionButton("clearexprs", "Clear"),
+                    conditionalPanel(
+	                condition = "input.collection == 'Powrie DB'",
+                        h4("Significant contrasts in database"),
+	                h5("Specify thresholds"),
+	                numericInput("lfc", label="lfc:", value = 0),
+	                numericInput("padj", label="padj", value = 0.05),
+	                actionButton("significant", "get significant")
+		    ),
+		),
+		mainPanel(headerPanel(""),
+			  tags$style(type='text/css', '#in.gene {background-color: rgba(255,255,0,0.40); color: green;}'), 
+                          verbatimTextOutput("in.gene"),
+			  headerPanel(""),
+		          plotOutput("gene.expression", height=800),
+	                  DT::dataTableOutput("significant.results")
+	        )
+            )
+        ),
+        tabPanel("2. Explore dataset", fluid=TRUE,
+	    sidebarLayout(
+	        sidebarPanel(
+		    h2("2. Explore specific dataset"),
+	            h4("Choose dataset"),
 
-    # Main panel for displaying outputs
-    mainPanel(
-              tabsetPanel(
-	          tabPanel("Datasets", DT::dataTableOutput("dataset.table")),
-                  tabPanel("1. Expression across datasets", plotOutput("gene.expression", height=800),
-	                                                 DT::dataTableOutput("significant.results")),
-	          tabPanel("2. Explore dataset", plotOutput("PC"),
-	                                      plotOutput("MAPlt", brush = "plot_brush_ma"),
-                                              verbatimTextOutput("gene.info.ma"),
-                                              DT::dataTableOutput("tabulate.results")),
-                  tabPanel("3. Compare datasets", plotOutput("scatter.lfc", brush = "plot_brush"),
-                                               verbatimTextOutput("gene.info"),
-	                                       plotOutput("venn"))
-                 )
-   )
-   )
-)
+                    conditionalPanel(
+	                condition = "input.collection == 'Powrie DB'",
+		        selectInput("choose.dataset", "Dataset:", choices = powrie.choices)
+		    ),
+                    conditionalPanel(
+	                condition = "input.collection == 'CRC DB'",
+		        selectInput("choose.dataset2", "Dataset:", choices = crc.choices)
+		    ),
+	            h4("Principle Components Analysis"),
+	            selectInput("PCs", "PC:", choices=c("PC1 vs. PC2" = "PC1_PC2",
+	                                                "PC1 vs. PC3" = "PC1_PC3",
+		    				        "PC2 vs. PC3" = "PC2_PC3")),
+	            h5("Colour by"),
+	            uiOutput("variable"),
+	            h5("Shape by"),
+	            uiOutput("variable.shape"),
+                    actionButton("PCA", "PCA"),
+	            actionButton("clearpca", "Clear"),
+	            downloadButton("download.pca", "Download"),
 
+                    conditionalPanel(
+	                condition = "input.collection == 'Powrie DB'",
+
+                        h4("Differential expression results"),
+                        uiOutput("ma.contrast"),
+	                h5("Thresholds"),
+	                numericInput("ma.lfc", label="lfc", value = 1),
+	                actionButton("MA", "MA plot"),
+	                actionButton("clearma", "Clear"),
+	                downloadButton("download.ma", "Download"),
+
+                        h5("Dispay results table"),
+	                actionButton("show.results", "Tabulate"),
+
+	                h5("Export results to current directory"),
+                        downloadButton("download.table", "Download")
+		    )
+		),
+		mainPanel(plotOutput("PC"),
+		          plotOutput("MAPlt", brush = "plot_brush_ma"),
+                          verbatimTextOutput("gene.info.ma"),
+                          DT::dataTableOutput("tabulate.results")
+	        )
+            )
+	),
+	tabPanel("3. Compare datasets", fluid=TRUE,
+	    sidebarLayout(
+	        sidebarPanel(
+                    conditionalPanel(condition="input.collection == 'Powrie DB'",
+                        h2("3. Compare results across datasets/contrasts"),
+	                selectInput("dataset1", "dataset 1", choices=getDatasetToContrastNames(powrie.conn)),
+	                selectInput("dataset2", "dataset 2", choices=getDatasetToContrastNames(powrie.conn)),
+	                actionButton("scatter.lfc", "Scatterplot lfc"),
+                        downloadButton("download.scatter", "Download"),
+
+                        h5("Venn diagram"),
+	                numericInput("venn.lfc", "lfc", value=1),
+	                actionButton("venn", "venn diagram")
+		    )
+                ),
+		mainPanel(plotOutput("scatter.lfc", brush = "plot_brush"),
+                                      verbatimTextOutput("gene.info"),
+	                              plotOutput("venn")
+	        )
+	    )
+	)
+    )
+)             		    
 
 # Define server logic
 server <- function(input, output) {
@@ -151,6 +172,19 @@ server <- function(input, output) {
     })
 
     #####################
+    # show gene being
+    # searched for
+    #####################
+
+    inGene <- eventReactive(input$gene.search, {
+        paste0("Displaying expression results for ", toupper(input$gene))
+    })
+
+    output$in.gene <- renderText({
+        inGene()
+    })
+
+    #####################
     # gene expression
     #####################
     expression <- eventReactive(input$gene.search, {
@@ -173,6 +207,14 @@ server <- function(input, output) {
 
     output$gene.expression <- renderPlot({
 	expression()
+    })
+
+    observeEvent(input$gene.search, {
+        show("gene.expression")
+    })
+
+    observeEvent(input$clearexprs, {
+        hide("gene.expression")
     })
 
     #####################
